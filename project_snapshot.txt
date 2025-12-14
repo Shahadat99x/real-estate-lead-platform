@@ -1,0 +1,247 @@
+﻿=== TREE (filtered) ===
+
+DIR  .git
+DIR  .next
+DIR  app
+DIR  components
+DIR  lib
+DIR  node_modules
+DIR  public
+DIR  scripts
+DIR  supabase
+DIR  types
+FILE .env.example
+FILE .env.local
+FILE .gitattributes
+FILE .gitignore
+FILE debug.txt
+FILE dev.err
+FILE dev.log
+FILE next-env.d.ts
+FILE package-lock.json
+FILE package.json
+FILE postcss.config.js
+FILE project_snapshot.txt
+FILE tailwind.config.js
+FILE tsconfig.json
+DIR  app\(public)
+DIR  app\api
+DIR  app\dashboard
+DIR  app\listings
+DIR  app\login
+DIR  app\logout
+FILE app\globals.css
+FILE app\layout.tsx
+DIR  app\(public)\agents
+DIR  app\(public)\blog
+DIR  app\(public)\listings
+FILE app\(public)\layout.tsx
+FILE app\(public)\page.tsx
+FILE app\(public)\agents\page.tsx
+FILE app\(public)\blog\page.tsx
+DIR  app\(public)\listings\[id]
+FILE app\(public)\listings\page.tsx
+FILE app\(public)\listings\[id]\LeadForm.tsx
+FILE app\(public)\listings\[id]\page.tsx
+DIR  app\api\cloudinary
+DIR  app\api\health
+DIR  app\api\cloudinary\sign
+FILE app\api\cloudinary\sign\route.ts
+FILE app\api\health\route.ts
+DIR  app\dashboard\admin
+DIR  app\dashboard\leads
+DIR  app\dashboard\listings
+FILE app\dashboard\DashboardShell.tsx
+FILE app\dashboard\layout.tsx
+FILE app\dashboard\page.tsx
+FILE app\dashboard\admin\layout.tsx
+FILE app\dashboard\admin\page.tsx
+FILE app\dashboard\leads\page.tsx
+DIR  app\dashboard\listings\new
+DIR  app\dashboard\listings\[id]
+FILE app\dashboard\listings\page.tsx
+FILE app\dashboard\listings\new\page.tsx
+DIR  app\dashboard\listings\[id]\edit
+DIR  app\dashboard\listings\[id]\media
+FILE app\dashboard\listings\[id]\edit\page.tsx
+FILE app\dashboard\listings\[id]\media\page.tsx
+DIR  app\listings\[id]
+FILE app\login\actions.ts
+FILE app\login\LoginForm.tsx
+FILE app\login\page.tsx
+FILE app\logout\route.ts
+DIR  components\dashboard
+DIR  components\listings
+DIR  components\site
+DIR  components\ui
+FILE components\dashboard\DeleteListingButton.tsx
+FILE components\dashboard\LeadDetailPanel.tsx
+FILE components\dashboard\LeadsFilters.tsx
+FILE components\dashboard\LeadsInbox.tsx
+FILE components\dashboard\ListingForm.tsx
+FILE components\dashboard\ListingImagesManager.tsx
+FILE components\dashboard\ListingsFilters.tsx
+FILE components\dashboard\ListingWizardInfoForm.tsx
+FILE components\dashboard\Pagination.tsx
+FILE components\dashboard\PublishButton.tsx
+FILE components\dashboard\PublishToggle.tsx
+FILE components\listings\AgentCard.tsx
+FILE components\listings\FiltersBar.tsx
+FILE components\listings\ListingCard.tsx
+FILE components\site\Footer.tsx
+FILE components\site\Header.tsx
+FILE components\site\MobileNav.tsx
+FILE components\ui\badge.tsx
+FILE components\ui\button.tsx
+FILE components\ui\card.tsx
+FILE components\ui\table-card.tsx
+DIR  lib\actions
+DIR  lib\queries
+DIR  lib\supabase
+FILE lib\authz.ts
+FILE lib\actions\leads.ts
+FILE lib\actions\listing-images.ts
+FILE lib\actions\listing-wizard.ts
+FILE lib\actions\listings.ts
+FILE lib\queries\agents.ts
+FILE lib\queries\dashboard.ts
+FILE lib\queries\listings.ts
+FILE lib\supabase\client.ts
+FILE lib\supabase\public.ts
+FILE lib\supabase\server.ts
+DIR  public\icons
+FILE public\manifest.webmanifest
+FILE public\icons\icon-192.png
+FILE public\icons\icon-512.png
+FILE scripts\db-verify.mjs
+FILE scripts\seed-demo.mjs
+FILE scripts\supabase-types.md
+DIR  supabase\.temp
+DIR  supabase\migrations
+FILE supabase\README.md
+FILE supabase\migrations\0001_init.sql
+FILE supabase\migrations\0002_public_images.sql
+FILE supabase\migrations\20250101000000_leads_inbox.sql
+FILE types\db.ts
+
+
+=== IMPORTANT FILE CONTENTS ===
+
+
+
+----- FILE: package.json -----
+
+{
+  "name": "real-estate-lead-platform",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "db:login": "supabase login",
+    "db:link": "supabase link --project-ref $SUPABASE_PROJECT_REF",
+    "db:push": "supabase db push",
+    "db:verify": "node scripts/db-verify.mjs",
+    "seed:demo": "node scripts/seed-demo.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "supabase": "^2.67.1",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.87.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
+    "lucide-react": "^0.561.0",
+    "next": "^16.0.10",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  }
+}
+
+
+
+----- FILE: postcss.config.js -----
+
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+
+
+
+----- FILE: tailwind.config.js -----
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}', './lib/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          50: '#f2f7ff',
+          100: '#e5edff',
+          200: '#c2d8ff',
+          300: '#9ec2ff',
+          400: '#5a94ff',
+          500: '#1e66ff',
+          600: '#124ad1',
+          700: '#0f3ca8',
+          800: '#0c2f83',
+          900: '#0a2568',
+        },
+      },
+    },
+  },
+  plugins: [],
+};
+
+
+
+----- FILE: tsconfig.json -----
+
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
+    "incremental": true,
+    "module": "esnext",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
+

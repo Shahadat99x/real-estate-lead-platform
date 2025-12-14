@@ -1,6 +1,7 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { useEffect } from 'react';
 import { redirect } from 'next/navigation';
 import { signIn } from './actions';
@@ -21,7 +22,7 @@ function SubmitButton() {
 }
 
 export default function LoginForm({ initialEmail }: { initialEmail?: string }) {
-  const [state, formAction] = useFormState<State, FormData>(signIn, {});
+  const [state, formAction, isPending] = useActionState(signIn, {}); // signature: (action, initialState) -> [state, action, isPending]
 
   useEffect(() => {
     if (state?.success) {

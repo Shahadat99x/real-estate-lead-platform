@@ -1,34 +1,54 @@
-import { Card, CardBody, CardHeader } from '../../../components/ui/card';
-import { TableCard } from '../../../components/ui/table-card';
+import { getCurrentProfile, requireUser } from '../../../lib/authz';
+import { getDashboardLeads } from '../../../lib/queries/dashboard';
+import { LeadsFilters } from '../../../components/dashboard/LeadsFilters';
+import { LeadsInbox } from '../../../components/dashboard/LeadsInbox';
+import { Pagination } from '../../../components/dashboard/Pagination';
 
-export default function LeadsPage() {
+export default async function DashboardLeadsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    q?: string;
+    status?: string;
+    page?: string;
+    listing?: string;
+  }>;
+}) {
+  await requireUser();
+  const profile = await getCurrentProfile();
+  if (!profile) return null;
+
+  const params = await searchParams;
+  const page = Number(params.page) || 1;
+  const pageSize = 20;
+
+  const { data: leads, count, totalPages } = await getDashboardLeads({
+    profileId: profile.id,
+    role: profile.role,
+    q: params.q,
+    status: params.status,
+    listingId: params.listing,
+    page,
+    pageSize,
+  });
+
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-semibold text-slate-900">Leads</h1>
-      <Card>
-        <CardHeader title="Lead inbox" subtitle="Coming soon: review inbound leads" />
-        <CardBody>
-          <p className="text-sm text-slate-600">Placeholder content for leads.</p>
-        </CardBody>
-      </Card>
-      <TableCard title="Recent leads" subtitle="Scrollable on small screens">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-slate-500">
-              <th className="py-2 pr-4">Name</th>
-              <th className="py-2 pr-4">Email</th>
-              <th className="py-2 pr-4">Listing</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-t border-slate-100">
-              <td className="py-2 pr-4 text-slate-800">Sample lead</td>
-              <td className="py-2 pr-4 text-slate-700">lead@example.com</td>
-              <td className="py-2 pr-4 text-slate-700">Sample listing</td>
-            </tr>
-          </tbody>
-        </table>
-      </TableCard>
+    <div className="space-y-4 h-[calc(100vh-100px)] flex flex-col">
+      <div className="flex-none space-y-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Leads Inbox</h1>
+          <p className="text-sm text-slate-600">Manage inquiries from your listings.</p>
+        </div>
+        <LeadsFilters />
+      </div>
+
+      <div className="flex-1 min-h-0">
+        <LeadsInbox leads={leads} />
+      </div>
+
+      <div className="flex-none">
+        <Pagination page={page} totalPages={totalPages} totalItems={count} />
+      </div>
     </div>
   );
 }

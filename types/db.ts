@@ -89,12 +89,12 @@ export interface Database {
           description: string | null;
           purpose: 'BUY' | 'RENT';
           property_type:
-            | 'APARTMENT'
-            | 'HOUSE'
-            | 'STUDIO'
-            | 'TOWNHOUSE'
-            | 'VILLA'
-            | 'LAND';
+          | 'APARTMENT'
+          | 'HOUSE'
+          | 'STUDIO'
+          | 'TOWNHOUSE'
+          | 'VILLA'
+          | 'LAND';
           status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
           price: number;
           currency: string;
@@ -117,12 +117,12 @@ export interface Database {
           description?: string | null;
           purpose: 'BUY' | 'RENT';
           property_type?:
-            | 'APARTMENT'
-            | 'HOUSE'
-            | 'STUDIO'
-            | 'TOWNHOUSE'
-            | 'VILLA'
-            | 'LAND';
+          | 'APARTMENT'
+          | 'HOUSE'
+          | 'STUDIO'
+          | 'TOWNHOUSE'
+          | 'VILLA'
+          | 'LAND';
           status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
           price: number;
           currency?: string;
@@ -145,12 +145,12 @@ export interface Database {
           description?: string | null;
           purpose?: 'BUY' | 'RENT';
           property_type?:
-            | 'APARTMENT'
-            | 'HOUSE'
-            | 'STUDIO'
-            | 'TOWNHOUSE'
-            | 'VILLA'
-            | 'LAND';
+          | 'APARTMENT'
+          | 'HOUSE'
+          | 'STUDIO'
+          | 'TOWNHOUSE'
+          | 'VILLA'
+          | 'LAND';
           status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
           price?: number;
           currency?: string;
@@ -205,6 +205,9 @@ export interface Database {
           phone: string | null;
           message: string;
           source: string | null;
+          status: 'NEW' | 'CONTACTED' | 'CLOSED' | 'ARCHIVED';
+          notes: string | null;
+          last_contacted_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -215,6 +218,9 @@ export interface Database {
           phone?: string | null;
           message: string;
           source?: string | null;
+          status?: 'NEW' | 'CONTACTED' | 'CLOSED' | 'ARCHIVED';
+          notes?: string | null;
+          last_contacted_at?: string | null;
           created_at?: string;
         };
         Update: {
@@ -225,6 +231,9 @@ export interface Database {
           phone?: string | null;
           message?: string;
           source?: string | null;
+          status?: 'NEW' | 'CONTACTED' | 'CLOSED' | 'ARCHIVED';
+          notes?: string | null;
+          last_contacted_at?: string | null;
           created_at?: string;
         };
       };

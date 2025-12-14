@@ -129,6 +129,80 @@ export async function getListingForEdit(id: string, profileId: string, role: 'AD
   return data;
 }
 
+export type DashboardLeadParams = {
+  profileId: string;
+  role: 'ADMIN' | 'AGENT';
+  q?: string;
+  status?: string;
+  listingId?: string;
+  sort?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+export async function getDashboardLeads({
+  profileId,
+  role,
+  q,
+  status,
+  listingId,
+  sort = 'newest',
+  page = 1,
+  pageSize = 20,
+}: DashboardLeadParams) {
+  const supabase = await createServerSupabaseClient();
+
+  // We select leads and the related listing info
+  // Note: Listings might be null if deleted, though referential integrity should prevent orphan leads usually.
+  let query = supabase
+    .from('leads')
+    .select('id, name, email, phone, message, status, created_at, notes, last_contacted_at, listings!inner(id, title, city, price, agent_id)', { count: 'exact' });
+
+  // Role Scoping
+  if (role !== 'ADMIN') {
+    // Check if the related listing belongs to this agent
+    // "listings!inner" enforces INNER JOIN, filtering leads that don't match the listing filter
+    query = query.eq('listings.agent_id', profileId);
+  }
+
+  // Search
+  if (q) {
+    query = query.or(`name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`);
+  }
+
+  // Filters
+  if (status && status !== 'ALL') {
+    query = query.eq('status', status);
+  }
+
+  if (listingId && listingId !== 'ALL') {
+    query = query.eq('listing_id', listingId);
+  }
+
+  // Sort
+  if (sort === 'oldest') {
+    query = query.order('created_at', { ascending: true });
+  } else {
+    query = query.order('created_at', { ascending: false });
+  }
+
+  // Pagination
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  return {
+    data: data || [],
+    count: count || 0,
+    page,
+    pageSize,
+    totalPages: count ? Math.ceil(count / pageSize) : 0,
+  };
+}
+
 export async function getListingForMedia(id: string) {
   const supabase = createServerSupabaseClient();
   const client = await supabase;

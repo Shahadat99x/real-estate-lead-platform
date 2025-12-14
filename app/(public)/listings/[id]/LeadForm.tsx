@@ -1,6 +1,7 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { createLead } from '../../../../lib/actions/leads';
 import { Button } from '../../../../components/ui/button';
 
@@ -14,11 +15,12 @@ function SubmitButton() {
 }
 
 export default function LeadForm({ listingId }: { listingId: string }) {
-  const [state, formAction] = useFormState(createLead, {});
+  const [state, formAction, isPending] = useActionState(createLead, {});
 
   return (
     <form action={formAction} className="space-y-3">
       <input type="hidden" name="listing_id" value={listingId} />
+      <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <input
           name="name"
