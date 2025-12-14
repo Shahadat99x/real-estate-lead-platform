@@ -26,18 +26,96 @@ export async function getOrCreateAgentForCurrentUser() {
   return data.id;
 }
 
-export async function getDashboardListings(profileId: string, role: 'ADMIN' | 'AGENT') {
+export type DashboardListingParams = {
+  profileId: string;
+  role: 'ADMIN' | 'AGENT';
+  q?: string;
+  status?: string;
+  purpose?: string;
+  featured?: string;
+  sort?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+export async function getDashboardListings({
+  profileId,
+  role,
+  q,
+  status,
+  purpose,
+  featured,
+  sort = 'newest',
+  page = 1,
+  pageSize = 20,
+}: DashboardListingParams) {
   const supabase = await createServerSupabaseClient();
+
+  // Base query
   let query = supabase
     .from('listings')
-    .select('id, title, city, price, purpose, status, featured, updated_at, agent_id')
-    .order('updated_at', { ascending: false });
+    .select('id, title, city, price, purpose, property_type, status, featured, updated_at, published_at, agent_id', { count: 'exact' });
+
+  // Role Scoping
   if (role !== 'ADMIN') {
     query = query.eq('agent_id', profileId);
   }
-  const { data, error } = await query;
+
+  // Search (Title or City) - Case insensitive partial match
+  if (q) {
+    query = query.or(`title.ilike.%${q}%,city.ilike.%${q}%`);
+  }
+
+  // Filters
+  if (status && status !== 'ALL') {
+    if (status === 'PUBLISHED') {
+      // Must be published status AND have a published_at date (defensive)
+      query = query.eq('status', 'PUBLISHED').not('published_at', 'is', null);
+    } else if (status === 'DRAFT') {
+      // DRAFT or null published_at
+      query = query.or('status.eq.DRAFT,published_at.is.null');
+    }
+  }
+
+  if (purpose && purpose !== 'ALL') {
+    query = query.eq('purpose', purpose);
+  }
+
+  if (role === 'ADMIN' && featured && featured !== 'ALL') {
+    if (featured === 'YES') query = query.eq('featured', true);
+    if (featured === 'NO') query = query.eq('featured', false);
+  }
+
+  // Sorting
+  switch (sort) {
+    case 'price_low':
+      query = query.order('price', { ascending: true });
+      break;
+    case 'price_high':
+      query = query.order('price', { ascending: false });
+      break;
+    case 'newest':
+    default:
+      query = query.order('updated_at', { ascending: false });
+      break;
+  }
+
+  // Pagination
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+
   if (error) throw error;
-  return data ?? [];
+
+  return {
+    data: data || [],
+    count: count || 0,
+    page,
+    pageSize,
+    totalPages: count ? Math.ceil(count / pageSize) : 0,
+  };
 }
 
 export async function getListingForEdit(id: string, profileId: string, role: 'ADMIN' | 'AGENT') {
@@ -49,4 +127,32 @@ export async function getListingForEdit(id: string, profileId: string, role: 'AD
   const { data, error } = await query;
   if (error) throw error;
   return data;
+}
+
+export async function getListingForMedia(id: string) {
+  const supabase = createServerSupabaseClient();
+  const client = await supabase;
+
+  // Auth is handled by createServerSupabaseClient (cookies) + RLS
+  const { data: listing, error } = await client
+    .from('listings')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error || !listing) {
+    return null;
+  }
+
+  // Fetch images sorted
+  const { data: images } = await client
+    .from('listing_images')
+    .select('*')
+    .eq('listing_id', id)
+    .order('sort_order', { ascending: true });
+
+  return {
+    ...listing,
+    listing_images: images || [],
+  };
 }
