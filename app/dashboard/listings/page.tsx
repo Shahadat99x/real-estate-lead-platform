@@ -4,7 +4,7 @@ import { getDashboardListings } from '../../../lib/queries/dashboard';
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import { Card, CardBody } from '../../../components/ui/card';
-import { setPublishedAction } from '../../../lib/actions/listings';
+import PublishToggle from '../../../components/dashboard/PublishToggle';
 
 function StatusBadge({ status }: { status: string }) {
   const color =
@@ -63,6 +63,11 @@ export default async function DashboardListingsPage() {
                     <Link href={`/dashboard/listings/${listing.id}/edit`} className="text-sm text-brand-700 font-semibold">
                       Edit
                     </Link>
+                    {listing.published_at && (
+                      <Link href={`/listings/${listing.id}`} className="text-sm text-slate-600 hover:text-brand-700">
+                        Public View
+                      </Link>
+                    )}
                     <PublishToggle id={listing.id} published={listing.status === 'PUBLISHED'} />
                   </div>
                 </div>
@@ -91,17 +96,5 @@ export default async function DashboardListingsPage() {
         </CardBody>
       </Card>
     </div>
-  );
-}
-
-function PublishToggle({ id, published }: { id: string; published: boolean }) {
-  return (
-    <form action={setPublishedAction}>
-      <input type="hidden" name="id" value={id} />
-      <input type="hidden" name="published" value={published ? 'false' : 'true'} />
-      <Button type="submit" variant="ghost" className="text-sm px-3">
-        {published ? 'Unpublish' : 'Publish'}
-      </Button>
-    </form>
   );
 }

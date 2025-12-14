@@ -1,4 +1,5 @@
-import { createServerSupabaseClient } from '../supabase/server';
+import { createPublicSupabaseClient } from '../supabase/public';
+import type { ListingsRow } from '../../types/db';
 
 export type ListingFilters = {
   city?: string;
@@ -11,7 +12,7 @@ export type ListingFilters = {
 };
 
 export async function getFeaturedListings() {
-  const supabase = await createServerSupabaseClient();
+  const supabase = createPublicSupabaseClient();
   const { data, error } = await supabase
     .from('listings')
     .select(
@@ -31,7 +32,7 @@ export async function getFeaturedListings() {
 }
 
 export async function getListings(filters: ListingFilters) {
-  const supabase = await createServerSupabaseClient();
+  const supabase = createPublicSupabaseClient();
   let query = supabase
     .from('listings')
     .select(
@@ -58,21 +59,35 @@ export async function getListings(filters: ListingFilters) {
 }
 
 export async function getListingById(id: string) {
-  const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
+  const supabase = createPublicSupabaseClient();
+  const { data: listing, error: listingError } = await supabase
     .from('listings')
-    .select(
-      `
-      *,
-      agents ( id, display_name, public_slug, is_active ),
-      listing_images ( id, url, sort_order, alt_text )
-    `
-    )
+    .select('*')
     .eq('id', id)
     .eq('status', 'PUBLISHED')
     .not('published_at', 'is', null)
-    .maybeSingle();
+    .single();
 
-  if (error) throw error;
-  return data ?? null;
+  const listingData = listing as ListingsRow | null;
+
+  if (listingError || !listingData) {
+    return null;
+  }
+
+  const { data: images } = await supabase
+    .from('listing_images')
+    .select('*')
+    .eq('listing_id', id)
+    .order('sort_order', { ascending: true });
+
+  const hasAgent = typeof listingData.agent_id === 'string';
+  const { data: agent } = hasAgent
+    ? await supabase.from('agents').select('*').eq('id', listingData.agent_id).maybeSingle()
+    : { data: null };
+
+  return {
+    ...listingData,
+    listing_images: images || [],
+    agents: agent || null,
+  };
 }

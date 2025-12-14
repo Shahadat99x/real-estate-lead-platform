@@ -1,6 +1,6 @@
-import { ListingCard } from '../../components/listings/ListingCard';
-import { FiltersBar } from '../../components/listings/FiltersBar';
-import { getListings } from '../../lib/queries/listings';
+import { ListingCard } from '../../../components/listings/ListingCard';
+import { FiltersBar } from '../../../components/listings/FiltersBar';
+import { getListings } from '../../../lib/queries/listings';
 
 const propertyTypes = ['APARTMENT', 'HOUSE', 'STUDIO', 'TOWNHOUSE', 'VILLA', 'LAND'];
 

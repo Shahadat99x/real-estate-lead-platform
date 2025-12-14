@@ -1,20 +1,24 @@
 import { createServerSupabaseClient } from '../supabase/server';
+import { getCurrentProfile } from '../authz';
 
-export async function ensureAgent(profileId: string) {
+export async function getOrCreateAgentForCurrentUser() {
+  const profile = await getCurrentProfile();
+  if (!profile) throw new Error('Not authenticated');
   const supabase = await createServerSupabaseClient();
-  const { data: existing } = await supabase.from('agents').select('id').eq('id', profileId).maybeSingle();
-  if (existing) return existing.id;
+  const { data: existing } = await supabase.from('agents').select('id').eq('id', profile.id).maybeSingle();
+  if (existing?.id) return existing.id;
 
+  const slug = `agent-${profile.id.slice(0, 6)}-${Math.floor(Math.random() * 1000)}`;
   const { data, error } = await supabase
     .from('agents')
     .insert({
-      id: profileId,
-      display_name: 'Agent',
+      id: profile.id,
+      display_name: profile.full_name || 'Agent',
       bio: 'New agent profile',
       languages: ['English'],
       service_areas: [],
       is_active: true,
-      public_slug: `agent-${profileId.slice(0, 6)}`,
+      public_slug: slug,
     })
     .select('id')
     .single();

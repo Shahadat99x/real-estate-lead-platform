@@ -4,12 +4,13 @@ import { ListingForm } from '../../../../../components/dashboard/ListingForm';
 import { getCurrentProfile, requireUser } from '../../../../../lib/authz';
 import { getListingForEdit } from '../../../../../lib/queries/dashboard';
 
-export default async function EditListingPage({ params }: { params: { id: string } }) {
+export default async function EditListingPage(props: { params: Promise<{ id: string }> }) {
+  const { id } = await props.params;
   await requireUser();
   const profile = await getCurrentProfile();
   if (!profile) return null;
 
-  const listing = await getListingForEdit(params.id, profile.id, profile.role);
+  const listing = await getListingForEdit(id, profile.id, profile.role);
   if (!listing) return notFound();
 
   return (
@@ -24,7 +25,7 @@ export default async function EditListingPage({ params }: { params: { id: string
         </Link>
       </div>
       <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-        <ListingForm listing={listing as any} />
+        <ListingForm listing={listing as any} role={profile.role} />
       </div>
     </div>
   );

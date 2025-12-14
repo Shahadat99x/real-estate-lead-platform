@@ -5,8 +5,7 @@ import type { Database } from '../../types/db';
 
 /**
  * Server-side Supabase client for Next.js App Router.
- * - Reads/writes auth cookies via next/headers so SSR + Server Actions stay in sync.
- * - Use only in server contexts (Route Handlers, Server Components, Server Actions).
+ * Reads/writes auth cookies via next/headers so SSR + Server Actions stay in sync.
  */
 export async function createServerSupabaseClient(): Promise<SupabaseClient<Database>> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -21,14 +20,21 @@ export async function createServerSupabaseClient(): Promise<SupabaseClient<Datab
   return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
       get(name: string) {
-        return cookieStore?.get(name)?.value;
+        return cookieStore.get(name)?.value;
       },
       set(name: string, value: string, options: CookieOptions) {
-        // Supabase client writes refreshed tokens; Next.js persists them to the response.
-        cookieStore?.set({ name, value, ...options });
+        try {
+          cookieStore.set({ name, value, ...options });
+        } catch {
+          // swallow to avoid Next.js "cookies can only be modified" errors in server components
+        }
       },
       remove(name: string, options: CookieOptions) {
-        cookieStore?.set({ name, value: '', ...options, maxAge: 0 });
+        try {
+          cookieStore.delete({ name, ...options });
+        } catch {
+          // swallow to avoid Next.js "cookies can only be modified" errors in server components
+        }
       },
     },
   });
@@ -39,9 +45,20 @@ export async function createServerSupabaseClient(): Promise<SupabaseClient<Datab
  */
 export async function getSession() {
   const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase.auth.getSession();
-  if (error) throw error;
-  return data.session ?? null;
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
+      // Check specifically for refresh token errors which cause 500s
+      if (error.code === 'refresh_token_not_found' || error.message.includes('Refresh Token Not Found')) {
+        return null;
+      }
+      throw error;
+    }
+    return data.session ?? null;
+  } catch (err) {
+    // Safety net for other auth errors during rendering
+    return null;
+  }
 }
 
 /**
@@ -49,11 +66,25 @@ export async function getSession() {
  */
 export async function getUser() {
   const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  // When logged out, Supabase returns an auth error; treat that as "no user" instead of throwing.
-  if (error && error.message !== 'Auth session missing!') throw error;
-  return user ?? null;
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    // When logged out, Supabase returns an auth error; treat that as "no user" instead of throwing.
+    if (error) {
+      // Specifically handle refresh token missing/invalid as logged out state
+      if (error.code === 'refresh_token_not_found' ||
+        error.message.includes('Refresh Token Not Found') ||
+        error.message === 'Auth session missing!') {
+        return null;
+      }
+      throw error;
+    }
+    return user ?? null;
+  } catch (err) {
+    // Safety net: if getUser fails during render (e.g. cookie issue), treat as anon
+    return null;
+  }
 }

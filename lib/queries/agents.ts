@@ -1,7 +1,7 @@
-import { createServerSupabaseClient } from '../supabase/server';
+import { createPublicSupabaseClient } from '../supabase/public';
 
 export async function getTopAgents() {
-  const supabase = await createServerSupabaseClient();
+  const supabase = createPublicSupabaseClient();
   const { data, error } = await supabase
     .from('agents')
     .select('id, display_name, bio, public_slug, is_active, service_areas')

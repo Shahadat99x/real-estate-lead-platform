@@ -11,6 +11,7 @@ type Props = {
 
 export function ListingCard({ listing }: Props) {
   const image = listing.listing_images?.sort((a, b) => a.sort_order - b.sort_order)[0];
+   const validId = typeof listing.id === 'string' && /^[0-9a-f-]{36}$/i.test(listing.id);
   return (
     <Card className="overflow-hidden">
       <div className="aspect-[4/3] bg-slate-100">
@@ -34,12 +35,16 @@ export function ListingCard({ listing }: Props) {
           <span>{listing.bathrooms ?? 0} ba</span>
           <span>{listing.area_sqm ?? '—'} sqm</span>
         </div>
-        <Link
-          href={`/listings/${listing.id}`}
-          className="inline-flex text-sm font-semibold text-brand-700 hover:underline"
-        >
-          View details →
-        </Link>
+        {validId ? (
+          <Link
+            href={`/listings/${listing.id}`}
+            className="inline-flex text-sm font-semibold text-brand-700 hover:underline"
+          >
+            View details →
+          </Link>
+        ) : (
+          <span className="inline-flex text-sm text-slate-400">View details unavailable</span>
+        )}
       </CardBody>
     </Card>
   );

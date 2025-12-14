@@ -14,7 +14,12 @@ export async function getCurrentProfile(): Promise<ProfilesRow | null> {
   } = await supabase.auth.getUser();
 
   // getUser returns an error when no session is present; treat that as logged-out.
-  if (userError && userError.message !== 'Auth session missing!') {
+  if (userError) {
+    if (userError.message === 'Auth session missing!' ||
+      userError.code === 'refresh_token_not_found' ||
+      userError.message.includes('Refresh Token Not Found')) {
+      return null;
+    }
     throw userError;
   }
   if (!user) return null;
@@ -39,8 +44,14 @@ export async function requireUser(options: { redirectTo?: string } = { redirectT
     error,
   } = await supabase.auth.getUser();
 
-  if (error && error.message !== 'Auth session missing!') {
-    throw error;
+  if (error) {
+    if (error.message === 'Auth session missing!' ||
+      error.code === 'refresh_token_not_found' ||
+      error.message.includes('Refresh Token Not Found')) {
+      // Allow flow to continue to 'if (!user)' check below
+    } else {
+      throw error;
+    }
   }
   if (!user) {
     if (options.redirectTo) redirect(options.redirectTo);

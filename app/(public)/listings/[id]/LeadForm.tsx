@@ -1,8 +1,8 @@
 'use client';
 
 import { useFormState, useFormStatus } from 'react-dom';
-import { createLead } from '../../../lib/actions/leads';
-import { Button } from '../../../components/ui/button';
+import { createLead } from '../../../../lib/actions/leads';
+import { Button } from '../../../../components/ui/button';
 
 function SubmitButton() {
   const { pending } = useFormStatus();

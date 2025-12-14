@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation';
-import { getListingById } from '../../../lib/queries/listings';
+import { getListingById } from '../../../../lib/queries/listings';
 import LeadForm from './LeadForm';
-import { Badge } from '../../../components/ui/badge';
-import { Card, CardBody } from '../../../components/ui/card';
+import { Badge } from '../../../../components/ui/badge';
+import { Card, CardBody } from '../../../../components/ui/card';
 
-export default async function ListingDetailPage({ params }: { params: { id: string } }) {
-  const listing = await getListingById(params.id);
+export default async function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const listing = await getListingById(id);
   if (!listing) return notFound();
 
   const sortedImages = (listing.listing_images || []).sort((a, b) => a.sort_order - b.sort_order);
