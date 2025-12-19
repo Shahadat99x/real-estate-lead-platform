@@ -149,7 +149,19 @@ export default async function DashboardListingsPage({
             )}
           </div>
         </CardBody>
-        <Pagination page={page} totalPages={totalPages} totalItems={count} />
+        <Pagination
+          basePath="/dashboard/listings"
+          page={page}
+          totalPages={totalPages}
+          totalItems={count}
+          query={{
+            q: params.q,
+            status: params.status,
+            purpose: params.purpose,
+            featured: params.featured,
+            sort: params.sort,
+          }}
+        />
       </Card>
     </div>
   );

@@ -1,0 +1,359 @@
+﻿===== package.json =====
+{
+  "name": "real-estate-lead-platform",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "db:login": "supabase login",
+    "db:link": "supabase link --project-ref $SUPABASE_PROJECT_REF",
+    "db:push": "supabase db push",
+    "db:verify": "node scripts/db-verify.mjs",
+    "seed:demo": "node scripts/seed-demo.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "supabase": "^2.67.1",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.87.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
+    "lucide-react": "^0.561.0",
+    "next": "^16.0.10",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  }
+}
+===== lib/supabase/public.ts =====
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '../../types/db';
+
+/**
+ * Public (anon) Supabase client for unauthenticated reads.
+ * No cookies are used; safe for public pages and static fetches.
+ * Explicitly disables auth persistence to prevent browser console errors/attempts.
+ */
+export function createPublicSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Missing Supabase environment variables.');
+  }
+  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  });
+}
+===== lib/supabase/server.ts =====
+import { cookies } from 'next/headers';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '../../types/db';
+
+/**
+ * Server-side Supabase client for Next.js App Router.
+ * Reads/writes auth cookies via next/headers so SSR + Server Actions stay in sync.
+ */
+export async function createServerSupabaseClient(): Promise<SupabaseClient<Database>> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Missing Supabase environment variables.');
+  }
+
+  const cookieStore = await cookies();
+
+  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      get(name: string) {
+        return cookieStore.get(name)?.value;
+      },
+      set(name: string, value: string, options: CookieOptions) {
+        try {
+          cookieStore.set({ name, value, ...options });
+        } catch {
+          // swallow to avoid Next.js "cookies can only be modified" errors in server components
+        }
+      },
+      remove(name: string, options: CookieOptions) {
+        try {
+          cookieStore.delete({ name, ...options });
+        } catch {
+          // swallow to avoid Next.js "cookies can only be modified" errors in server components
+        }
+      },
+    },
+  });
+}
+
+/**
+ * Convenience to fetch the current auth session (or null when logged out).
+ */
+export async function getSession() {
+  const supabase = await createServerSupabaseClient();
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
+      // Check specifically for refresh token errors which cause 500s
+      if (error.code === 'refresh_token_not_found' || error.message.includes('Refresh Token Not Found')) {
+        return null;
+      }
+      throw error;
+    }
+    return data.session ?? null;
+  } catch (err) {
+    // Safety net for other auth errors during rendering
+    return null;
+  }
+}
+
+/**
+ * Convenience to fetch the current user (or null when logged out).
+ */
+export async function getUser() {
+  const supabase = await createServerSupabaseClient();
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    // When logged out, Supabase returns an auth error; treat that as "no user" instead of throwing.
+    if (error) {
+      // Specifically handle refresh token missing/invalid as logged out state
+      if (error.code === 'refresh_token_not_found' ||
+        error.message.includes('Refresh Token Not Found') ||
+        error.message === 'Auth session missing!') {
+        return null;
+      }
+      throw error;
+    }
+    return user ?? null;
+  } catch (err) {
+    // Safety net: if getUser fails during render (e.g. cookie issue), treat as anon
+    return null;
+  }
+}
+===== lib/authz.ts =====
+import { redirect } from 'next/navigation';
+import type { ProfilesRow, Role } from '../types/db';
+import { createServerSupabaseClient } from './supabase/server';
+
+/**
+ * Fetch the current user's profile row (or null if logged out).
+ * Uses a single Supabase client to read auth + profile within the same RLS context.
+ */
+export async function getCurrentProfile(): Promise<ProfilesRow | null> {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  // getUser returns an error when no session is present; treat that as logged-out.
+  if (userError) {
+    if (userError.message === 'Auth session missing!' ||
+      userError.code === 'refresh_token_not_found' ||
+      userError.message.includes('Refresh Token Not Found')) {
+      return null;
+    }
+    throw userError;
+  }
+  if (!user) return null;
+
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profileError) throw profileError;
+  return profile ?? null;
+}
+
+/**
+ * Require an authenticated user, otherwise redirect to login.
+ */
+export async function requireUser(options: { redirectTo?: string } = { redirectTo: '/login' }) {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error) {
+    if (error.message === 'Auth session missing!' ||
+      error.code === 'refresh_token_not_found' ||
+      error.message.includes('Refresh Token Not Found')) {
+      // Allow flow to continue to 'if (!user)' check below
+    } else {
+      throw error;
+    }
+  }
+  if (!user) {
+    if (options.redirectTo) redirect(options.redirectTo);
+    throw new Error('Not authenticated');
+  }
+  return user;
+}
+
+/**
+ * Guard helper for server code (Route Handlers / Server Actions).
+ * Redirects or throws when the caller is not in one of the allowed roles.
+ */
+export async function requireRole(
+  roles: Role[],
+  options: { redirectTo?: string } = { redirectTo: '/login' }
+): Promise<ProfilesRow> {
+  const profile = await getCurrentProfile();
+
+  if (!profile) {
+    if (options.redirectTo) redirect(options.redirectTo);
+    throw new Error('Not authenticated');
+  }
+
+  if (!roles.includes(profile.role)) {
+    if (options.redirectTo) redirect(options.redirectTo);
+    throw new Error('Forbidden');
+  }
+
+  return profile;
+}
+
+===== supabase/migrations/20250101000000_leads_inbox.sql =====
+-- Add new columns for leads inbox features
+ALTER TABLE leads 
+ADD COLUMN IF NOT EXISTS status text NOT NULL DEFAULT 'NEW',
+ADD COLUMN IF NOT EXISTS notes text,
+ADD COLUMN IF NOT EXISTS last_contacted_at timestamptz;
+
+-- Add checking constraint for status
+ALTER TABLE leads 
+ADD CONSTRAINT leads_status_check 
+CHECK (status IN ('NEW', 'CONTACTED', 'CLOSED', 'ARCHIVED'));
+
+===== supabase/migrations/20250101000001_leads_owner_policies.sql =====
+-- Add missing RLS policies for leads update/delete
+-- Agents need to be able to update and delete leads for their own listings
+
+-- Allow agents to update leads that belong to their listings
+CREATE POLICY leads_owner_update
+ON public.leads
+FOR UPDATE
+USING (
+  EXISTS (
+    SELECT 1 FROM public.listings l
+    WHERE l.id = listing_id
+      AND l.agent_id = public.current_user_id()
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM public.listings l
+    WHERE l.id = listing_id
+      AND l.agent_id = public.current_user_id()
+  )
+);
+
+-- Allow agents to delete leads that belong to their listings
+CREATE POLICY leads_owner_delete
+ON public.leads
+FOR DELETE
+USING (
+  EXISTS (
+    SELECT 1 FROM public.listings l
+    WHERE l.id = listing_id
+      AND l.agent_id = public.current_user_id()
+  )
+);
+
+===== supabase/migrations/20250101000002_blog_posts.sql =====
+-- Create blog_posts table
+CREATE TABLE IF NOT EXISTS blog_posts (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  slug text NOT NULL,
+  excerpt text,
+  content text NOT NULL,
+  cover_image_url text,
+  status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
+  published_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT blog_posts_pkey PRIMARY KEY (id),
+  CONSTRAINT blog_posts_slug_key UNIQUE (slug)
+);
+
+-- Enable RLS
+ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Public can view published posts
+CREATE POLICY "Public can view published posts"
+  ON blog_posts
+  FOR SELECT
+  TO public
+  USING (status = 'published');
+
+-- Policy: Admins can do everything
+-- Assumes profile.role is available via a hypothetical auth.email() check or custom claim.
+-- Since previous migrations/authz.ts imply a "profiles" table and role based auth,
+-- we'll rely on a joined check or similar mechanism if possible, 
+-- BUT robust RLS often needs a helper function or claims.
+-- Based on the user's prompt "App runs ... Supabase schema ... in supabase/migrations",
+-- I'll use a common pattern: check generic authenticated access for now, 
+-- or better, check the profiles table if exists.
+-- Let's look at what the user said: "ADMIN can CRUD all".
+-- I'll use a policy that checks the `profiles` table for the current user's role.
+
+CREATE POLICY "Admins can do everything"
+  ON blog_posts
+  FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE profiles.id = auth.uid()
+      AND profiles.role = 'admin'
+    )
+  );
+
+-- Policy: Agents can view published posts (same as public, but explicit for authenticated users if needed)
+-- Actually, the public policy applies to anon. Authenticated users (Agents) also need read access.
+-- If the public policy is "TO public", it covers everyone including authenticated unless we restrict it.
+-- Supabase "public" role includes everyone. So "Public can view published posts" covers Agents.
+-- However, we explicitly need to ensure Agents CANNOT CRUD.
+-- The "Admins can do everything" covers CRUD for admins.
+-- An "Agents read only" policy for non-published? No, Agent cannot read drafts.
+-- So Agents are effectively same as public for this table.
+-- Just in case, I will add an explicit read policy for authenticated users for published posts 
+-- to be safe if `public` role is restricted in project settings (less common).
+CREATE POLICY "Authenticated can view published posts"
+  ON blog_posts
+  FOR SELECT
+  TO authenticated
+  USING (status = 'published');
+
+-- Create updated_at trigger
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_blog_posts_updated_at
+    BEFORE UPDATE ON blog_posts
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_updated_at_column();

@@ -11,6 +11,7 @@ const navItems = [
   { href: '/dashboard', label: 'Overview', roles: ['ADMIN', 'AGENT'] as const },
   { href: '/dashboard/listings', label: 'Listings', roles: ['ADMIN', 'AGENT'] as const },
   { href: '/dashboard/leads', label: 'Leads', roles: ['ADMIN', 'AGENT'] as const },
+  { href: '/dashboard/admin/blog', label: 'Blog', roles: ['ADMIN'] as const },
   { href: '/dashboard/admin', label: 'Admin', roles: ['ADMIN'] as const },
 ];
 

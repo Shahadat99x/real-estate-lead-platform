@@ -47,7 +47,13 @@ export default async function DashboardLeadsPage({
       </div>
 
       <div className="flex-none">
-        <Pagination page={page} totalPages={totalPages} totalItems={count} />
+        <Pagination
+          basePath="/dashboard/leads"
+          page={page}
+          totalPages={totalPages}
+          totalItems={count}
+          query={{ q: params.q, status: params.status, listing: params.listing }}
+        />
       </div>
     </div>
   );

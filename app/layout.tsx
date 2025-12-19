@@ -1,4 +1,5 @@
 import './globals.css';
+import '@uiw/react-md-editor/markdown-editor.css';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 

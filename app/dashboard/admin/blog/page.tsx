@@ -1,94 +1,154 @@
-import { getBlogPosts } from '@/lib/blog';
-import { requireRole } from '@/lib/authz';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { PlusCircle, Edit, FileText, Globe } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { formatDate } from '@/lib/utils'; // Assuming this exists, if not I'll check or inline it
+import { Badge } from '../../../../components/ui/badge';
+import { Button } from '../../../../components/ui/button';
+import { Card, CardBody } from '../../../../components/ui/card';
+import { TableCard } from '../../../../components/ui/table-card';
+import { Pagination } from '../../../../components/dashboard/Pagination';
+import { deletePostAction, setPostPublishedAction } from '../../../../lib/actions/blog';
+import { getAllPostsForAdmin } from '../../../../lib/queries/blog';
 
-export default async function AdminBlogPage() {
-    await requireRole(['admin']);
+export default async function AdminBlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
+}) {
+  const params = await searchParams;
+  const q = params.q ?? '';
+  const statusFilter = params.status ?? 'ALL';
+  const page = Number(params.page) || 1;
+  const pageSize = 15;
 
-    const { posts } = await getBlogPosts({ status: 'all', limit: 100 });
+  const { data: posts, count, totalPages } = await getAllPostsForAdmin({
+    q,
+    status: statusFilter,
+    page,
+    pageSize,
+  });
 
-    return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Blog Posts</h1>
-                    <p className="text-muted-foreground">
-                        Manage your blog content and publications.
-                    </p>
-                </div>
-                <Button asChild>
-                    <Link href="/dashboard/admin/blog/new">
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        New Post
-                    </Link>
-                </Button>
-            </div>
+  const redirectTo = (() => {
+    const next = new URLSearchParams();
+    if (q) next.set('q', q);
+    if (statusFilter) next.set('status', statusFilter);
+    next.set('page', page.toString());
+    const qs = next.toString();
+    return qs ? `/dashboard/admin/blog?${qs}` : '/dashboard/admin/blog';
+  })();
 
-            <div className="border rounded-md">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
-                            <tr>
-                                <th className="px-6 py-3">Title</th>
-                                <th className="px-6 py-3">Status</th>
-                                <th className="px-6 py-3">Published At</th>
-                                <th className="px-6 py-3">Created At</th>
-                                <th className="px-6 py-3 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {posts.length === 0 ? (
-                                <tr>
-                                    <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
-                                        No posts found. Create your first blog post!
-                                    </td>
-                                </tr>
-                            ) : (
-                                posts.map((post) => (
-                                    <tr key={post.id} className="bg-background hover:bg-muted/50 transition-colors">
-                                        <td className="px-6 py-4 font-medium">
-                                            <div className="flex flex-col">
-                                                <span className="truncate max-w-xs" title={post.title}>{post.title}</span>
-                                                <span className="text-xs text-muted-foreground truncate max-w-xs">{post.slug}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                                                {post.status}
-                                            </Badge>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {post.published_at ? new Date(post.published_at).toLocaleDateString() : '-'}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {new Date(post.created_at).toLocaleDateString()}
-                                        </td>
-                                        <td className="px-6 py-4 text-right space-x-2">
-                                            {post.status === 'published' && (
-                                                <Button variant="ghost" size="icon" asChild title="View Live">
-                                                    <Link href={`/blog/${post.slug}`} target="_blank">
-                                                        <Globe className="h-4 w-4" />
-                                                    </Link>
-                                                </Button>
-                                            )}
-                                            <Button variant="outline" size="sm" asChild>
-                                                <Link href={`/dashboard/admin/blog/${post.id}`}>
-                                                    <Edit className="mr-2 h-3 w-3" />
-                                                    Edit
-                                                </Link>
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Blog posts</h1>
+          <p className="text-sm text-slate-600">Draft, publish, and manage articles for the public site.</p>
         </div>
-    );
+        <Button asChild>
+          <Link href="/dashboard/admin/blog/new">New post</Link>
+        </Button>
+      </div>
+
+      <Card>
+        <CardBody className="space-y-3">
+          <form method="get" className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <input
+              name="q"
+              placeholder="Search by title or slug"
+              defaultValue={q}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
+            />
+            <select
+              name="status"
+              defaultValue={statusFilter}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
+            >
+              <option value="ALL">All statuses</option>
+              <option value="DRAFT">Draft</option>
+              <option value="PUBLISHED">Published</option>
+            </select>
+            <div className="flex items-center sm:justify-end">
+              <Button type="submit" className="w-full sm:w-auto">
+                Filter
+              </Button>
+            </div>
+          </form>
+        </CardBody>
+      </Card>
+
+      <TableCard title="All posts" subtitle="Includes drafts and published posts">
+        <table className="min-w-full divide-y divide-slate-200">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Title</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Status</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Published</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Updated</th>
+              <th className="px-4 py-3 text-right text-xs font-semibold text-slate-600 uppercase tracking-wide">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 bg-white">
+            {posts.length === 0 ? (
+              <tr>
+                <td className="px-4 py-6 text-sm text-slate-500" colSpan={5}>
+                  No posts found. Create your first draft to get started.
+                </td>
+              </tr>
+            ) : (
+              posts.map((post) => {
+                const isPublished = post.status === 'PUBLISHED';
+                const publishedLabel = post.published_at
+                  ? new Date(post.published_at).toLocaleDateString()
+                  : '-';
+                const updatedLabel = post.updated_at ? new Date(post.updated_at).toLocaleDateString() : '-';
+
+                return (
+                  <tr key={post.id}>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-1">
+                        <p className="font-semibold text-slate-900">{post.title}</p>
+                        <p className="text-xs text-slate-500">/blog/{post.slug}</p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge className={isPublished ? 'bg-green-50 text-green-700 border-green-200' : ''}>{post.status}</Badge>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-slate-600">{publishedLabel}</td>
+                    <td className="px-4 py-3 text-sm text-slate-600">{updatedLabel}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/dashboard/admin/blog/${post.id}/edit`}>Edit</Link>
+                        </Button>
+                        <form action={setPostPublishedAction}>
+                          <input type="hidden" name="id" value={post.id} />
+                          <input type="hidden" name="publish" value={isPublished ? 'false' : 'true'} />
+                          <input type="hidden" name="redirectTo" value={redirectTo} />
+                          <Button variant={isPublished ? 'ghost' : 'secondary'} size="sm" type="submit">
+                            {isPublished ? 'Unpublish' : 'Publish'}
+                          </Button>
+                        </form>
+                        <form action={deletePostAction}>
+                          <input type="hidden" name="id" value={post.id} />
+                          <input type="hidden" name="redirectTo" value={redirectTo} />
+                          <Button variant="destructive" size="sm" type="submit">
+                            Delete
+                          </Button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </TableCard>
+
+      <Pagination
+        basePath="/dashboard/admin/blog"
+        page={page}
+        totalPages={totalPages}
+        totalItems={count}
+        query={{ q, status: statusFilter }}
+      />
+    </div>
+  );
 }

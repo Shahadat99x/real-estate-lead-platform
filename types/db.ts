@@ -237,6 +237,47 @@ export interface Database {
           created_at?: string;
         };
       };
+      blog_posts: {
+        Row: {
+          id: string;
+          author_id: string | null;
+          title: string;
+          slug: string;
+          excerpt: string | null;
+          content_md: string;
+          cover_image_url: string | null;
+          status: 'DRAFT' | 'PUBLISHED';
+          published_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          author_id?: string | null;
+          title: string;
+          slug: string;
+          excerpt?: string | null;
+          content_md: string;
+          cover_image_url?: string | null;
+          status?: 'DRAFT' | 'PUBLISHED';
+          published_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          author_id?: string | null;
+          title?: string;
+          slug?: string;
+          excerpt?: string | null;
+          content_md?: string;
+          cover_image_url?: string | null;
+          status?: 'DRAFT' | 'PUBLISHED';
+          published_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -259,4 +300,5 @@ export type AgentsRow = Database['public']['Tables']['agents']['Row'];
 export type ListingsRow = Database['public']['Tables']['listings']['Row'];
 export type ListingImagesRow = Database['public']['Tables']['listing_images']['Row'];
 export type LeadsRow = Database['public']['Tables']['leads']['Row'];
+export type BlogPostRow = Database['public']['Tables']['blog_posts']['Row'];
 export type Role = ProfilesRow['role'];
