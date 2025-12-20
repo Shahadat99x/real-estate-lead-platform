@@ -14,11 +14,12 @@ export default function Footer() {
             <Link href="/listings" className="hover:text-brand-700">Listings</Link>
             <Link href="/agents" className="hover:text-brand-700">Agents</Link>
             <Link href="/blog" className="hover:text-brand-700">Blog</Link>
+            <Link href="/login" className="hover:text-brand-700">Admin login</Link>
           </div>
         </div>
         <div className="space-y-2">
           <p className="text-sm font-semibold text-slate-900">Contact</p>
-          <p className="text-sm text-slate-600">hello@example.com</p>
+          <p className="text-sm text-slate-600">contact@yourdomain.com</p>
           <p className="text-sm text-slate-600">+1 (555) 123-4567</p>
         </div>
       </div>
