@@ -113,22 +113,22 @@ export default async function AdminBlogPage({
                     <td className="px-4 py-3 text-sm text-slate-600">{publishedLabel}</td>
                     <td className="px-4 py-3 text-sm text-slate-600">{updatedLabel}</td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button variant="outline" size="sm" asChild>
+                      <div className="flex flex-col sm:flex-row items-end sm:items-center justify-end gap-2">
+                        <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
                           <Link href={`/dashboard/admin/blog/${post.id}/edit`}>Edit</Link>
                         </Button>
-                        <form action={setPostPublishedAction}>
+                        <form action={setPostPublishedAction} className="w-full sm:w-auto">
                           <input type="hidden" name="id" value={post.id} />
                           <input type="hidden" name="publish" value={isPublished ? 'false' : 'true'} />
                           <input type="hidden" name="redirectTo" value={redirectTo} />
-                          <Button variant={isPublished ? 'ghost' : 'secondary'} size="sm" type="submit">
+                          <Button variant={isPublished ? 'ghost' : 'secondary'} size="sm" type="submit" className="w-full sm:w-auto">
                             {isPublished ? 'Unpublish' : 'Publish'}
                           </Button>
                         </form>
-                        <form action={deletePostAction}>
+                        <form action={deletePostAction} className="w-full sm:w-auto">
                           <input type="hidden" name="id" value={post.id} />
                           <input type="hidden" name="redirectTo" value={redirectTo} />
-                          <Button variant="destructive" size="sm" type="submit">
+                          <Button variant="destructive" size="sm" type="submit" className="w-full sm:w-auto">
                             Delete
                           </Button>
                         </form>

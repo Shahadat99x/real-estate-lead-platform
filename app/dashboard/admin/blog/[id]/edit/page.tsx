@@ -7,7 +7,8 @@ import { deletePostAction, setPostPublishedAction, updatePostAction } from '../.
 import { getPostByIdForAdmin } from '../../../../../../lib/queries/blog';
 import { PostForm } from '../../_components/PostForm';
 
-export default async function EditBlogPostPage({ params }: { params: { id: string } }) {
+export default async function EditBlogPostPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { id } = params;
   const post = await getPostByIdForAdmin(id);
   if (!post) return notFound();
