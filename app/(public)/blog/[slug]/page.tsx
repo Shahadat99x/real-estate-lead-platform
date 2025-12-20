@@ -82,10 +82,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
 
         <Card>
-          <CardBody className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-p:text-slate-700">
-            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
-              {post.content_md}
-            </ReactMarkdown>
+          <CardBody>
+            <article className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-p:text-slate-700">
+              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
+                {post.content_md}
+              </ReactMarkdown>
+            </article>
           </CardBody>
         </Card>
       </div>
