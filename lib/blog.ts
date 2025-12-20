@@ -70,3 +70,22 @@ export async function getBlogPostBySlug(slug: string) {
 
   return data as BlogPost;
 }
+
+export async function getLatestPublicPosts(limit: number = 3) {
+  const { createPublicSupabaseClient } = await import('./supabase/public');
+  const supabase = createPublicSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('id, title, slug, excerpt, published_at, cover_image_url')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching latest public posts:', error);
+    return [];
+  }
+
+  return data as Partial<BlogPost>[];
+}
