@@ -11,6 +11,7 @@ export async function getOrCreateAgentForCurrentUser() {
   const slug = `agent-${profile.id.slice(0, 6)}-${Math.floor(Math.random() * 1000)}`;
   const { data, error } = await supabase
     .from('agents')
+    // @ts-ignore
     .insert({
       id: profile.id,
       display_name: profile.full_name || 'Agent',
@@ -110,7 +111,7 @@ export async function getDashboardListings({
   if (error) throw error;
 
   return {
-    data: data || [],
+    data: (data || []) as any[],
     count: count || 0,
     page,
     pageSize,
@@ -195,7 +196,7 @@ export async function getDashboardLeads({
   if (error) throw error;
 
   return {
-    data: data || [],
+    data: (data || []) as any[],
     count: count || 0,
     page,
     pageSize,

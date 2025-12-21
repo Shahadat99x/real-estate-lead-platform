@@ -54,6 +54,10 @@ export function ListingWizardInfoForm() {
                                 rows={3}
                                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
                             />
+                            <p className="text-xs text-slate-500">
+                                Tip: Use short paragraphs. Line breaks are preserved.
+                            </p>
+
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
