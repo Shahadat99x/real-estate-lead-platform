@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Image from 'next/image';
+import { SmartImage } from '../../components/ui/smart-image';
 import { getFeaturedListings } from '../../lib/queries/listings';
 import { getLatestPublicPosts } from '../../lib/blog';
 import { ListingCard } from '../../components/listings/ListingCard';
@@ -62,7 +62,7 @@ export default async function HomePage() {
                   <Card className="h-full hover:shadow-md transition-shadow duration-200 overflow-hidden border-slate-200 flex flex-col">
                     {post.cover_image_url ? (
                       <div className="relative w-full h-48 bg-slate-100">
-                        <Image
+                        <SmartImage
                           src={post.cover_image_url}
                           alt={post.title || 'Blog post'}
                           fill

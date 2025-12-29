@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { SmartImage } from '../ui/smart-image';
 import Link from 'next/link';
 import { Badge } from '../ui/badge';
 import { Card, CardBody } from '../ui/card';
@@ -17,7 +17,7 @@ export function ListingCard({ listing }: Props) {
     <Card className="overflow-hidden">
       <div className="aspect-[4/3] bg-slate-100 relative">
         {image ? (
-          <Image
+          <SmartImage
             src={image.url}
             alt={image.alt_text ?? listing.title}
             fill

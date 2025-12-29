@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { SmartImage } from '../../../../components/ui/smart-image';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -71,7 +71,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
         {post.cover_image_url && (
           <div className="rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm relative aspect-video">
-            <Image
+            <SmartImage
               src={post.cover_image_url}
               alt={post.title}
               fill

@@ -23,6 +23,10 @@ const nextConfig: NextConfig = {
                 protocol: 'https',
                 hostname: 'xsggames.co', // Common avatar source
             },
+            {
+                protocol: 'https',
+                hostname: 'res.cloudinary.com', // Cloudinary for uploaded images
+            },
         ],
     },
     typescript: {
