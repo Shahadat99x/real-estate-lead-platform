@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const mainImage = (listing.listing_images as any[])?.[0]?.url;
 
   return {
-    title: `${listing.title} | EstateNova`,
+    title: listing.title,
     description: listing.description?.substring(0, 160) || `View details for this ${listing.property_type} in ${listing.city}.`,
     openGraph: {
       title: listing.title,

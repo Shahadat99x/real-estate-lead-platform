@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   const description = post.excerpt || 'Read insights from our real estate team.';
 
   return {
-    title: `${post.title} | Blog`,
+    title: post.title,
     description,
     openGraph: {
       title: post.title,
