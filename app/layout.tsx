@@ -6,7 +6,6 @@ import { ReactNode } from 'react';
 export const metadata: Metadata = {
   title: 'EstateNova | Modern Real Estate Platform',
   description: 'Find your dream home with EstateNova.',
-  manifest: '/manifest.webmanifest',
   icons: {
     icon: '/logo-icon.svg',
     shortcut: '/favicon.svg',
@@ -14,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
-  themeColor: '#0F172A',
+  themeColor: '#1e66ff',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
