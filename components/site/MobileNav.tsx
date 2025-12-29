@@ -2,13 +2,20 @@
 
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import { Button } from '../ui/button';
 
 export default function MobileNav({ links, ctaHref, ctaLabel }: { links: { href: string; label: string }[]; ctaHref: string; ctaLabel: string }) {
     const [open, setOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const navRef = useRef<HTMLElement>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
+
+    // Handle mounting for SSR
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Lock body scroll and handle focus/ESC
     useEffect(() => {
@@ -21,6 +28,8 @@ export default function MobileNav({ links, ctaHref, ctaLabel }: { links: { href:
 
         if (open) {
             document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
             window.addEventListener('keydown', handleKeyDown);
             // Focus internal close button or first link after animation
             setTimeout(() => {
@@ -29,37 +38,26 @@ export default function MobileNav({ links, ctaHref, ctaLabel }: { links: { href:
             }, 100);
         } else {
             document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
             window.removeEventListener('keydown', handleKeyDown);
         }
         return () => {
             document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, [open]);
 
-    return (
+    const overlayContent = (
         <>
-            <button
-                ref={triggerRef}
-                aria-label={open ? "Close menu" : "Open menu"}
-                aria-expanded={open}
-                aria-controls="mobile-menu-drawer"
-                className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
-                onClick={() => setOpen(true)}
-            >
-                <div className="space-y-1.5" aria-hidden="true">
-                    <span className="block h-0.5 w-6 bg-slate-800 rounded-full"></span>
-                    <span className="block h-0.5 w-6 bg-slate-800 rounded-full"></span>
-                    <span className="block h-0.5 w-6 bg-slate-800 rounded-full"></span>
-                </div>
-            </button>
-
             {/* Backdrop */}
             <div
                 aria-hidden="true"
                 className={clsx(
-                    'fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm transition-all duration-300',
-                    open ? 'opacity-100 visible' : 'opacity-0 invisible'
+                    'fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm transition-all duration-300',
+                    open ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
                 )}
                 onClick={() => setOpen(false)}
             />
@@ -72,7 +70,7 @@ export default function MobileNav({ links, ctaHref, ctaLabel }: { links: { href:
                 aria-modal="true"
                 aria-label="Mobile Navigation"
                 className={clsx(
-                    'fixed inset-y-0 right-0 z-50 w-[80%] max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-in-out',
+                    'fixed top-0 right-0 z-[60] w-[80%] max-w-sm h-[100dvh] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out',
                     open ? 'translate-x-0' : 'translate-x-full'
                 )}
             >
@@ -119,6 +117,27 @@ export default function MobileNav({ links, ctaHref, ctaLabel }: { links: { href:
                     </div>
                 </div>
             </aside>
+        </>
+    );
+
+    return (
+        <>
+            <button
+                ref={triggerRef}
+                aria-label={open ? "Close menu" : "Open menu"}
+                aria-expanded={open}
+                aria-controls="mobile-menu-drawer"
+                className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
+                onClick={() => setOpen(true)}
+            >
+                <div className="space-y-1.5" aria-hidden="true">
+                    <span className="block h-0.5 w-6 bg-slate-800 rounded-full"></span>
+                    <span className="block h-0.5 w-6 bg-slate-800 rounded-full"></span>
+                    <span className="block h-0.5 w-6 bg-slate-800 rounded-full"></span>
+                </div>
+            </button>
+
+            {mounted && createPortal(overlayContent, document.body)}
         </>
     );
 }
