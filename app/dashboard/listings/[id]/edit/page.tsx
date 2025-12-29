@@ -10,7 +10,7 @@ export default async function EditListingPage(props: { params: Promise<{ id: str
   const profile = await getCurrentProfile();
   if (!profile) return null;
 
-  const listing = await getListingForEdit(id, profile.id, profile.role);
+  const listing = await getListingForEdit(id, profile.id, profile.role) as any;
   if (!listing) return notFound();
 
   return (

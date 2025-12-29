@@ -19,9 +19,11 @@ type Props = { profile: ProfilesRow; children: React.ReactNode };
 
 export default function DashboardShell({ profile, children }: Props) {
   const [open, setOpen] = useState(false);
+  const showAgentUI = profile.role === 'AGENT';
+  const showAdminUI = profile.role === 'ADMIN';
   const pathname = usePathname();
 
-  const filteredNav = navItems.filter((item) => item.roles.includes(profile.role));
+  const filteredNav = navItems.filter((item) => (item.roles as any).includes(profile.role));
 
   const SidebarContent = (
     <div className="h-full flex flex-col bg-white border-r border-slate-200">

@@ -32,7 +32,7 @@ function SubmitButton({ label, name, value }: { label: string; name?: string; va
 }
 
 export function PostForm({ action, initialData, submitLabel = 'Save post' }: { action: FormAction; initialData?: Partial<BlogPostRow>; submitLabel?: string }) {
-  const [state, formAction] = useActionState<FormState, FormData>(action, { error: '', message: '' });
+  const [state, formAction] = useActionState<FormState, FormData>(action as any, { error: '', message: '' });
   const [title, setTitle] = useState(initialData?.title ?? '');
   const [slug, setSlug] = useState(initialData?.slug ?? '');
   const [slugEdited, setSlugEdited] = useState(Boolean(initialData?.slug));

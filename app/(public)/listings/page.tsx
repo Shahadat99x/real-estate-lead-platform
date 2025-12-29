@@ -27,7 +27,7 @@ export default async function ListingsPage(props: {
     property_type: searchParams?.property_type,
   };
 
-  const listings = await getListings(filters);
+  const listings = await getListings(filters) as any[];
 
   return (
     <div className="min-h-screen bg-[#f6f8fb] px-4 sm:px-6 lg:px-10 py-10 space-y-6">
@@ -39,7 +39,7 @@ export default async function ListingsPage(props: {
         <FiltersBar propertyTypes={propertyTypes} />
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {listings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing as any} />
+            <ListingCard key={listing.id} listing={listing} />
           ))}
         </div>
         {listings.length === 0 && (

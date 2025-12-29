@@ -2,8 +2,8 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
-import { requireRole } from '@/lib/authz';
+import { createServerSupabaseClient } from '../../lib/supabase/server';
+import { requireRole } from '../../lib/authz';
 import { z } from 'zod';
 
 const PostSchema = z.object({

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { Card, CardBody, CardHeader } from '../../../components/ui/card';
+import { Card, CardBody } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { getPublishedPosts } from '../../../lib/queries/blog';
 
@@ -67,15 +67,12 @@ export default async function BlogIndexPage() {
                       </div>
                     )}
                   </div>
-                  <CardHeader
-                    title={
-                      <Link href={`/blog/${post.slug}`} className="text-lg font-semibold text-slate-900 hover:text-brand-700">
-                        {post.title}
-                      </Link>
-                    }
-                    subtitle={publishedLabel ?? 'Recently updated'}
-                    className="pb-2"
-                  />
+                  <div className="p-5 pb-2 space-y-1">
+                    <Link href={`/blog/${post.slug}`} className="text-lg font-semibold text-slate-900 hover:text-brand-700 block">
+                      {post.title}
+                    </Link>
+                    <p className="text-sm text-slate-500">{publishedLabel ?? 'Recently updated'}</p>
+                  </div>
                   <CardBody className="flex flex-col gap-4 text-sm text-slate-600">
                     <p className="line-clamp-3 leading-relaxed">{post.excerpt || 'Stay tuned for more details soon.'}</p>
                     <Button variant="outline" asChild className="w-full">

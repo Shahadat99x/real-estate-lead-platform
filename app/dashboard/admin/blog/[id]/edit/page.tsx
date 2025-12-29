@@ -63,7 +63,7 @@ export default async function EditBlogPostPage(props: { params: Promise<{ id: st
           <Card>
             <CardHeader title="Publishing" subtitle="Control visibility of this post." />
             <CardBody className="space-y-3">
-              <form action={setPostPublishedAction} className="space-y-2">
+              <form action={setPostPublishedAction as any} className="space-y-2">
                 <input type="hidden" name="id" value={post.id} />
                 <input type="hidden" name="redirectTo" value={redirectTo} />
                 <input type="hidden" name="publish" value={isPublished ? 'false' : 'true'} />
@@ -80,7 +80,7 @@ export default async function EditBlogPostPage(props: { params: Promise<{ id: st
           <Card>
             <CardHeader title="Danger zone" subtitle="Delete removes the post permanently." />
             <CardBody className="space-y-2">
-              <form action={deletePostAction} className="space-y-2">
+              <form action={deletePostAction as any} className="space-y-2">
                 <input type="hidden" name="id" value={post.id} />
                 <input type="hidden" name="redirectTo" value="/dashboard/admin/blog" />
                 <Button type="submit" variant="destructive" className="w-full">

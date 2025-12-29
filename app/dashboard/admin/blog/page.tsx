@@ -117,7 +117,7 @@ export default async function AdminBlogPage({
                         <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
                           <Link href={`/dashboard/admin/blog/${post.id}/edit`}>Edit</Link>
                         </Button>
-                        <form action={setPostPublishedAction} className="w-full sm:w-auto">
+                        <form action={setPostPublishedAction as any} className="w-full sm:w-auto">
                           <input type="hidden" name="id" value={post.id} />
                           <input type="hidden" name="publish" value={isPublished ? 'false' : 'true'} />
                           <input type="hidden" name="redirectTo" value={redirectTo} />
@@ -125,7 +125,7 @@ export default async function AdminBlogPage({
                             {isPublished ? 'Unpublish' : 'Publish'}
                           </Button>
                         </form>
-                        <form action={deletePostAction} className="w-full sm:w-auto">
+                        <form action={deletePostAction as any} className="inline w-full sm:w-auto">
                           <input type="hidden" name="id" value={post.id} />
                           <input type="hidden" name="redirectTo" value={redirectTo} />
                           <Button variant="destructive" size="sm" type="submit" className="w-full sm:w-auto">
