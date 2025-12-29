@@ -19,7 +19,7 @@ export default function LeadForm({ listingId }: { listingId: string }) {
 
   if (state.success) {
     return (
-      <div className="bg-green-50 border border-green-100 rounded-xl p-6 text-center space-y-2 animate-in fade-in duration-300">
+      <div role="status" aria-live="polite" className="bg-green-50 border border-green-100 rounded-xl p-6 text-center space-y-2 animate-in fade-in duration-300">
         <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-xl">
           ✅
         </div>
@@ -33,11 +33,12 @@ export default function LeadForm({ listingId }: { listingId: string }) {
 
   return (
     <form action={formAction} className="space-y-4">
+      {/* ... keeping existing form content ... */}
       <input type="hidden" name="listing_id" value={listingId} />
-      {/* Honeypot field - must be hidden and empty */}
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* ... */}
         <div className="space-y-1">
           <label htmlFor="name" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Name <span className="text-red-500">*</span></label>
           <input
@@ -85,7 +86,7 @@ export default function LeadForm({ listingId }: { listingId: string }) {
       </div>
 
       {state.error && (
-        <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3 flex items-start gap-2">
+        <div role="alert" className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3 flex items-start gap-2">
           <span>⚠️</span>
           <span>{state.error}</span>
         </div>
