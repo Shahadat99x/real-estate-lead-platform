@@ -1,9 +1,10 @@
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 import { getListingById } from '../../../../lib/queries/listings';
 import LeadForm from './LeadForm';
 import { Badge } from '../../../../components/ui/badge';
 import { Card, CardBody } from '../../../../components/ui/card';
-import { Metadata } from 'next';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -52,9 +53,16 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          {sortedImages.map((img) => (
-            <div key={img.id} className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
-              <img src={img.url} alt={img.alt_text ?? listing.title} className="h-full w-full object-cover" />
+          {sortedImages.map((img, index) => (
+            <div key={img.id} className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 relative">
+              <Image
+                src={img.url}
+                alt={img.alt_text ?? listing.title}
+                fill
+                priority={index === 0}
+                sizes="(max-width: 640px) 100vw, 50vw"
+                className="object-cover"
+              />
             </div>
           ))}
           {sortedImages.length === 0 && (

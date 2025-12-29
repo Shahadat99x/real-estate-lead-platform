@@ -1,7 +1,10 @@
 import './globals.css';
 import '@uiw/react-md-editor/markdown-editor.css';
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import { ReactNode } from 'react';
+
+const inter = Inter({ subsets: ['latin'] });
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -51,7 +54,7 @@ export const viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-[#f6f8fb] text-slate-900">
+      <body className={`min-h-screen bg-[#f6f8fb] text-slate-900 ${inter.className}`}>
         {children}
       </body>
     </html>

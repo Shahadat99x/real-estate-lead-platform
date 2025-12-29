@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -69,9 +70,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
 
         {post.cover_image_url && (
-          <div className="rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={post.cover_image_url} alt={post.title} className="w-full h-auto object-cover" />
+          <div className="rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm relative aspect-video">
+            <Image
+              src={post.cover_image_url}
+              alt={post.title}
+              fill
+              priority
+              className="object-cover"
+            />
           </div>
         )}
 

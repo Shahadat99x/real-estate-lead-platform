@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '../ui/badge';
 import { Card, CardBody } from '../ui/card';
@@ -11,12 +12,18 @@ type Props = {
 
 export function ListingCard({ listing }: Props) {
   const image = listing.listing_images?.sort((a, b) => a.sort_order - b.sort_order)[0];
-   const validId = typeof listing.id === 'string' && /^[0-9a-f-]{36}$/i.test(listing.id);
+  const validId = typeof listing.id === 'string' && /^[0-9a-f-]{36}$/i.test(listing.id);
   return (
     <Card className="overflow-hidden">
-      <div className="aspect-[4/3] bg-slate-100">
+      <div className="aspect-[4/3] bg-slate-100 relative">
         {image ? (
-          <img src={image.url} alt={image.alt_text ?? listing.title} className="h-full w-full object-cover" />
+          <Image
+            src={image.url}
+            alt={image.alt_text ?? listing.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover"
+          />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-brand-50 to-brand-100" />
         )}
