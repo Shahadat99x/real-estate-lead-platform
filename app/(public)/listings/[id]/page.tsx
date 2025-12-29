@@ -3,13 +3,36 @@ import { getListingById } from '../../../../lib/queries/listings';
 import LeadForm from './LeadForm';
 import { Badge } from '../../../../components/ui/badge';
 import { Card, CardBody } from '../../../../components/ui/card';
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const listing = await getListingById(id);
+  if (!listing) {
+    return {
+      title: 'Listing Not Found',
+    };
+  }
+
+  const mainImage = (listing.listing_images as any[])?.[0]?.url;
+
+  return {
+    title: `${listing.title} | EstateNova`,
+    description: listing.description?.substring(0, 160) || `View details for this ${listing.property_type} in ${listing.city}.`,
+    openGraph: {
+      title: listing.title,
+      description: listing.description?.substring(0, 160),
+      images: mainImage ? [mainImage] : [],
+    },
+  };
+}
 
 export default async function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const listing = await getListingById(id);
   if (!listing) return notFound();
 
-  const sortedImages = (listing.listing_images || []).sort((a, b) => a.sort_order - b.sort_order) as any[];
+  const sortedImages = ((listing.listing_images || []) as any[]).sort((a, b) => a.sort_order - b.sort_order);
 
   return (
     <div className="min-h-screen bg-[#f6f8fb] px-4 sm:px-6 lg:px-10 py-10">
