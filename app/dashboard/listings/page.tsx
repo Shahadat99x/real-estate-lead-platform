@@ -67,7 +67,7 @@ export default async function DashboardListingsPage({
 
       <Card>
         <CardBody className="p-0">
-          <div className="hidden md:grid grid-cols-7 gap-4 px-6 py-3 text-xs font-semibold text-slate-500 border-b border-slate-200 bg-slate-50/50">
+          <div className="hidden lg:grid grid-cols-7 gap-4 px-6 py-3 text-xs font-semibold text-slate-500 border-b border-slate-200 bg-slate-50/50">
             <span className="col-span-2">Title</span>
             <span>Location</span>
             <span>Price</span>
@@ -79,7 +79,7 @@ export default async function DashboardListingsPage({
             {listings.map((listing) => (
               <div key={listing.id} className="px-6 py-4 hover:bg-slate-50/50 transition-colors">
                 {/* Mobile View */}
-                <div className="md:hidden space-y-3">
+                <div className="lg:hidden space-y-3">
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="text-base font-semibold text-slate-900 line-clamp-2">{listing.title}</p>
@@ -91,7 +91,7 @@ export default async function DashboardListingsPage({
                   <div className="flex items-baseline justify-between">
                     <p className="text-lg font-medium text-slate-900">€{Intl.NumberFormat('en-US').format(listing.price)}</p>
                     <div className="flex gap-2">
-                      <Badge variant="outline">{listing.purpose}</Badge>
+                      <Badge className="bg-white border-slate-200 text-slate-700 border">{listing.purpose}</Badge>
                       {listing.featured && <Badge className="bg-brand-50 text-brand-700 border-brand-100">Featured</Badge>}
                     </div>
                   </div>
@@ -112,7 +112,7 @@ export default async function DashboardListingsPage({
                 </div>
 
                 {/* Desktop View */}
-                <div className="hidden md:grid grid-cols-7 gap-4 items-center">
+                <div className="hidden lg:grid grid-cols-7 gap-4 items-center">
                   <div className="col-span-2">
                     <p className="font-medium text-slate-900 truncate" title={listing.title}>{listing.title}</p>
                     {/* Optional: Add ID or reference if needed, kept clean for now */}
@@ -120,7 +120,7 @@ export default async function DashboardListingsPage({
                   <p className="text-sm text-slate-700 truncate">{listing.city}</p>
                   <p className="text-sm font-medium text-slate-900">€{Intl.NumberFormat('en-US').format(listing.price)}</p>
                   <div>
-                    <Badge variant="outline" className="font-normal text-slate-600">{listing.purpose}</Badge>
+                    <Badge className="bg-white border-slate-200 text-slate-600 font-normal border">{listing.purpose}</Badge>
                   </div>
                   <div className="flex items-center gap-2">
                     <StatusBadge status={listing.status} />
@@ -142,7 +142,7 @@ export default async function DashboardListingsPage({
             {listings.length === 0 && (
               <div className="px-6 py-12 text-center text-slate-500 bg-slate-50/30">
                 <p>No listings found matching your criteria.</p>
-                <Button variant="link" asChild className="mt-2">
+                <Button variant="ghost" asChild className="mt-2">
                   <Link href="/dashboard/listings">Clear filters</Link>
                 </Button>
               </div>

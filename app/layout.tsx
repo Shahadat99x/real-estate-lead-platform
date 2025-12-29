@@ -4,13 +4,17 @@ import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: 'Real Estate Dashboard',
-  description: 'Manage listings and leads',
+  title: 'EstateNova | Modern Real Estate Platform',
+  description: 'Find your dream home with EstateNova.',
   manifest: '/manifest.webmanifest',
+  icons: {
+    icon: '/logo-icon.svg',
+    shortcut: '/favicon.svg',
+  },
 };
 
 export const viewport = {
-  themeColor: '#1e66ff',
+  themeColor: '#0F172A',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

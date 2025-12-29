@@ -44,7 +44,7 @@ export default function LeadForm({ listingId }: { listingId: string }) {
             id="name"
             name="name"
             required
-            placeholder="John Doe"
+            placeholder="Your name"
             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
           />
         </div>
@@ -55,7 +55,7 @@ export default function LeadForm({ listingId }: { listingId: string }) {
             name="email"
             type="email"
             required
-            placeholder="john@example.com"
+            placeholder="name@email.com"
             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
           />
         </div>
@@ -67,7 +67,7 @@ export default function LeadForm({ listingId }: { listingId: string }) {
           id="phone"
           name="phone"
           type="tel"
-          placeholder="+1 (555) 000-0000"
+          placeholder="Phone number (optional)"
           className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
         />
       </div>

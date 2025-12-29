@@ -9,7 +9,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   const listing = await getListingById(id);
   if (!listing) return notFound();
 
-  const sortedImages = (listing.listing_images || []).sort((a, b) => a.sort_order - b.sort_order);
+  const sortedImages = (listing.listing_images || []).sort((a, b) => a.sort_order - b.sort_order) as any[];
 
   return (
     <div className="min-h-screen bg-[#f6f8fb] px-4 sm:px-6 lg:px-10 py-10">
@@ -23,7 +23,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
           <p className="text-lg font-semibold text-slate-900">
             €{Intl.NumberFormat('en-US').format(listing.price)} · {listing.city}
           </p>
-          <p className="text-sm text-slate-600">{listing.description}</p>
+          <p className="text-sm text-slate-600 whitespace-pre-line leading-relaxed">
+            {listing.description || 'No description provided.'}
+          </p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
@@ -33,7 +35,10 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             </div>
           ))}
           {sortedImages.length === 0 && (
-            <div className="aspect-[4/3] rounded-xl bg-gradient-to-br from-brand-50 to-brand-100" />
+            <div className="aspect-[4/3] rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-slate-400 gap-2">
+              <span className="text-4xl">📷</span>
+              <span className="text-sm font-medium">No photos uploaded yet</span>
+            </div>
           )}
         </div>
 
@@ -44,12 +49,14 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
               <span className="font-semibold text-slate-900">{listing.bathrooms ?? '—'} ba</span>
               <span className="font-semibold text-slate-900">{listing.area_sqm ?? '—'} sqm</span>
             </div>
-            <p>
-              Agent:{' '}
-              <span className="font-semibold text-slate-900">
-                {listing.agents?.display_name ?? 'Agent'}
-              </span>
-            </p>
+            {listing.agents?.display_name && (
+              <p>
+                Listed by:{' '}
+                <span className="font-semibold text-slate-900">
+                  {listing.agents.display_name}
+                </span>
+              </p>
+            )}
           </CardBody>
         </Card>
 
