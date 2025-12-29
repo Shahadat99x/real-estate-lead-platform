@@ -117,19 +117,38 @@ export default async function HomePage() {
 
 function Hero() {
   return (
-    <section className="relative px-4 sm:px-6 lg:px-10 py-16 sm:py-24 bg-white">
-      <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
-        <Badge className="bg-brand-50 text-brand-700 border-brand-100 px-3 py-1 text-sm">
-          #1 Local Real Estate Brokerage
-        </Badge>
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight text-balance">
-          Find a place you'll love to live.
-        </h1>
-        <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto text-balance">
-          Curated listings, exclusive market insights, and a personalized experience from your local property expert.
-        </p>
-        <div className="pt-4 max-w-xl mx-auto">
+    <section className="relative px-4 sm:px-6 lg:px-10 py-20 sm:py-32 overflow-hidden">
+      {/* Background Gradient Mesh */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-50 to-white -z-20" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-brand-50/50 rounded-full blur-3xl -z-10 opacity-60 pointer-events-none" />
+
+      <div className="max-w-5xl mx-auto text-center space-y-10 relative z-10">
+        <div className="space-y-6">
+          <Badge className="bg-white text-brand-700 border-brand-100 shadow-sm px-4 py-1.5 text-sm font-medium rounded-full">
+            ✨ #1 Rated Real Estate Platform
+          </Badge>
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-slate-900 tracking-tight text-balance leading-[1.1]">
+            Find a place you'll <span className="animate-shine bg-[linear-gradient(110deg,#16a34a,45%,#4ade80,55%,#16a34a)] bg-[length:200%_100%] bg-clip-text text-transparent motion-reduce:animate-none motion-reduce:text-brand-600">love</span> to live.
+          </h1>
+          <p className="text-xl sm:text-2xl text-slate-500 max-w-3xl mx-auto text-balance font-light leading-relaxed">
+            Curated listings, exclusive market insights, and a personalized experience for modern buyers and renters.
+          </p>
+        </div>
+
+        <div className="pt-8 max-w-4xl mx-auto">
           <SearchBar />
+        </div>
+
+        {/* Quick stats or trust markers */}
+        <div className="pt-8 flex items-center justify-center gap-8 text-sm font-medium text-slate-400">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            10k+ Active Listings
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-brand-500" />
+            Trusted by 500+ Brokers
+          </div>
         </div>
       </div>
     </section>
@@ -138,28 +157,50 @@ function Hero() {
 
 function SearchBar() {
   return (
-    <form action="/listings" className="grid gap-3 sm:grid-cols-4 bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-2 border border-slate-100">
-      <input
-        className="w-full rounded-xl bg-slate-50 border-transparent px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
-        placeholder="City or Zip"
-        name="city"
-      />
-      <select
-        name="purpose"
-        className="w-full rounded-xl bg-slate-50 border-transparent px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
-      >
-        <option value="">Any Type</option>
-        <option value="BUY">Buy</option>
-        <option value="RENT">Rent</option>
-      </select>
-      <input
-        className="w-full rounded-xl bg-slate-50 border-transparent px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
-        placeholder="Max Price"
-        name="maxPrice"
-      />
-      <Button type="submit" className="w-full h-full rounded-xl font-bold shadow-sm">
-        Search
-      </Button>
+    <form action="/listings" className="relative group">
+      {/* Glow effect */}
+      <div className="absolute -inset-1 bg-gradient-to-r from-brand-200 to-blue-200 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+
+      <div className="relative grid gap-0 sm:grid-cols-[1fr,auto,auto,auto] bg-white shadow-2xl shadow-slate-200/50 rounded-2xl p-2 border border-slate-100 items-center divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+        <div className="relative pb-2 sm:pb-0">
+          <div className="absolute left-4 top-4 sm:top-1/2 -translate-y-1/2 text-lg">📍</div>
+          <input
+            className="w-full bg-transparent border-transparent pl-12 pr-4 py-4 text-base text-slate-900 placeholder:text-slate-400 focus:border-transparent focus:ring-0 truncate"
+            placeholder="City, neighborhood..."
+            name="city"
+          />
+        </div>
+
+        <div className="relative min-w-[160px] py-1 sm:py-0">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">🏠</div>
+          <select
+            name="purpose"
+            className="w-full bg-transparent border-transparent pl-10 pr-8 py-4 text-base text-slate-900 focus:border-transparent focus:ring-0 appearance-none cursor-pointer"
+          >
+            <option value="">Any Type</option>
+            <option value="BUY">Buy</option>
+            <option value="RENT">Rent</option>
+            <option value="SOLD">Sold</option>
+          </select>
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">⌄</div>
+        </div>
+
+        <div className="relative min-w-[160px] py-1 sm:py-0">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">💰</div>
+          <input
+            className="w-full bg-transparent border-transparent pl-10 pr-4 py-4 text-base text-slate-900 placeholder:text-slate-400 focus:border-transparent focus:ring-0"
+            placeholder="Max Price"
+            name="maxPrice"
+            type="number"
+          />
+        </div>
+
+        <div className="pt-2 sm:pt-0 sm:pl-2">
+          <Button type="submit" className="w-full sm:w-auto h-14 sm:h-auto rounded-xl font-bold shadow-lg hover:shadow-xl bg-slate-900 text-white hover:bg-brand-700 transition-all px-8 text-lg">
+            Search
+          </Button>
+        </div>
+      </div>
     </form>
   );
 }
