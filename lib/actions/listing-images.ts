@@ -36,6 +36,41 @@ export async function addListingImageAction(prevState: any, formData: FormData) 
     return { ok: true };
 }
 
+export async function addListingImageByUrlAction(prevState: any, formData: FormData) {
+    await requireUser();
+    const supabase = await createServerSupabaseClient();
+
+    const listingId = formData.get('listingId') as string;
+    const url = formData.get('url') as string;
+    const altText = formData.get('altText') as string;
+
+    if (!listingId || !url) {
+        return { error: 'Listing ID and image URL are required' };
+    }
+
+    // Validate URL format (must start with http:// or https://)
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        return { error: 'Image URL must start with http:// or https://' };
+    }
+
+    // RLS will enforce we can only insert if we own the listing
+    const { error } = await supabase.from('listing_images').insert({
+        listing_id: listingId,
+        url,
+        public_id: null, // No Cloudinary public_id for external URLs
+        alt_text: altText || null,
+        sort_order: 999, // Append to end
+    });
+
+    if (error) {
+        console.error('Add Image by URL Error:', error);
+        return { error: 'Failed to save image. Please check the URL and try again.' };
+    }
+
+    revalidatePath(`/dashboard/listings/${listingId}/media`);
+    return { ok: true, message: 'Image added successfully!' };
+}
+
 export async function deleteListingImageAction(prevState: any, formData: FormData) {
     await requireUser();
     const supabase = await createServerSupabaseClient();

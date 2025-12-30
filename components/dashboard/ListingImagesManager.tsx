@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useRef, useOptimistic, useTransition } from 'react';
+import { useState, useRef, useOptimistic, useTransition, useActionState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '../ui/button';
-import { addListingImageAction, deleteListingImageAction, reorderListingImagesAction } from '../../lib/actions/listing-images';
+import { addListingImageAction, addListingImageByUrlAction, deleteListingImageAction, reorderListingImagesAction } from '../../lib/actions/listing-images';
 
 type Image = {
     id: string;
@@ -129,6 +129,9 @@ export function ListingImagesManager({
                 </div>
             )}
 
+            {/* Add Image by URL Section */}
+            <AddImageByUrl listingId={listingId} onSuccess={() => router.refresh()} />
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {optimisticImages.map((image, index) => (
                     <div key={image.id} className="relative aspect-square group bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
@@ -190,6 +193,76 @@ export function ListingImagesManager({
                     </div>
                 ))}
             </div>
+        </div>
+    );
+}
+
+// Component for adding images by external URL
+function AddImageByUrl({ listingId, onSuccess }: { listingId: string; onSuccess: () => void }) {
+    const [url, setUrl] = useState('');
+    const [altText, setAltText] = useState('');
+    const [state, formAction, isPending] = useActionState(addListingImageByUrlAction, null);
+
+    const handleSubmit = async (formData: FormData) => {
+        formAction(formData);
+        if (state?.ok) {
+            setUrl('');
+            setAltText('');
+            onSuccess();
+        }
+    };
+
+    return (
+        <div className="border border-slate-200 rounded-xl p-4 bg-slate-50">
+            <h4 className="text-sm font-semibold text-slate-900 mb-3">Add Image from URL</h4>
+            <form action={handleSubmit} className="space-y-3">
+                <input type="hidden" name="listingId" value={listingId} />
+
+                <div>
+                    <label className="text-xs font-medium text-slate-700 block mb-1">
+                        Image URL <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="url"
+                        name="url"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        placeholder="https://example.com/image.jpg"
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="text-xs font-medium text-slate-700 block mb-1">
+                        Alt Text <span className="text-slate-500">(optional)</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="altText"
+                        value={altText}
+                        onChange={(e) => setAltText(e.target.value)}
+                        placeholder="Description of the image"
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
+                    />
+                </div>
+
+                {state?.error && (
+                    <div className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">
+                        {state.error}
+                    </div>
+                )}
+
+                {state?.ok && (
+                    <div className="text-sm text-green-600 bg-green-50 border border-green-200 px-3 py-2 rounded-lg">
+                        {state.message || 'Image added successfully!'}
+                    </div>
+                )}
+
+                <Button type="submit" disabled={isPending || !url} className="w-full" variant="secondary">
+                    {isPending ? 'Adding...' : 'Add from URL'}
+                </Button>
+            </form>
         </div>
     );
 }
