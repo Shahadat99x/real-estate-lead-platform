@@ -73,24 +73,23 @@ export default async function AdminBlogPage({
         </CardBody>
       </Card>
 
-      <TableCard title="All posts" subtitle="Includes drafts and published posts">
-        <table className="min-w-full divide-y divide-slate-200">
-          <thead className="bg-slate-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Title</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Published</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Updated</th>
-              <th className="px-4 py-3 text-right text-xs font-semibold text-slate-600 uppercase tracking-wide">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 bg-white">
+      <Card>
+        <CardBody className="p-0">
+          {/* Desktop Table Header */}
+          <div className="hidden lg:grid grid-cols-6 gap-4 px-4 py-3 text-xs font-semibold text-slate-600 uppercase tracking-wide border-b border-slate-200 bg-slate-50">
+            <span className="col-span-2">Title</span>
+            <span>Status</span>
+            <span>Published</span>
+            <span>Updated</span>
+            <span className="text-right">Actions</span>
+          </div>
+
+          {/* Posts List */}
+          <div className="divide-y divide-slate-100">
             {posts.length === 0 ? (
-              <tr>
-                <td className="px-4 py-6 text-sm text-slate-500" colSpan={5}>
-                  No posts found. Create your first draft to get started.
-                </td>
-              </tr>
+              <div className="px-4 py-12 text-center text-slate-500 bg-slate-50/30">
+                <p>No posts found. Create your first draft to get started.</p>
+              </div>
             ) : (
               posts.map((post) => {
                 const isPublished = post.status === 'PUBLISHED';
@@ -100,47 +99,87 @@ export default async function AdminBlogPage({
                 const updatedLabel = post.updated_at ? new Date(post.updated_at).toLocaleDateString() : '-';
 
                 return (
-                  <tr key={post.id}>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-col gap-1">
-                        <p className="font-semibold text-slate-900">{post.title}</p>
-                        <p className="text-xs text-slate-500">/blog/{post.slug}</p>
+                  <div key={post.id} className="px-4 py-4 hover:bg-slate-50/50 transition-colors">
+                    {/* Mobile Card View */}
+                    <div className="lg:hidden space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-slate-900 line-clamp-2">{post.title}</p>
+                          <p className="text-xs text-slate-500 mt-1">/blog/{post.slug}</p>
+                        </div>
+                        <Badge className={isPublished ? 'bg-green-50 text-green-700 border-green-200' : ''}>
+                          {post.status}
+                        </Badge>
                       </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge className={isPublished ? 'bg-green-50 text-green-700 border-green-200' : ''}>{post.status}</Badge>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-600">{publishedLabel}</td>
-                    <td className="px-4 py-3 text-sm text-slate-600">{updatedLabel}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-col sm:flex-row items-end sm:items-center justify-end gap-2">
-                        <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
+
+                      <div className="flex items-center justify-between text-sm text-slate-600">
+                        <span>Published: {publishedLabel}</span>
+                        <span>Updated: {updatedLabel}</span>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+                        <Button variant="outline" size="sm" asChild className="flex-1">
                           <Link href={`/dashboard/admin/blog/${post.id}/edit`}>Edit</Link>
                         </Button>
-                        <form action={setPostPublishedAction as any} className="w-full sm:w-auto">
+                        <form action={setPostPublishedAction as any} className="flex-1">
                           <input type="hidden" name="id" value={post.id} />
                           <input type="hidden" name="publish" value={isPublished ? 'false' : 'true'} />
                           <input type="hidden" name="redirectTo" value={redirectTo} />
-                          <Button variant={isPublished ? 'ghost' : 'secondary'} size="sm" type="submit" className="w-full sm:w-auto">
+                          <Button variant={isPublished ? 'ghost' : 'secondary'} size="sm" type="submit" className="w-full">
                             {isPublished ? 'Unpublish' : 'Publish'}
                           </Button>
                         </form>
-                        <form action={deletePostAction as any} className="inline w-full sm:w-auto">
+                        <form action={deletePostAction as any}>
                           <input type="hidden" name="id" value={post.id} />
                           <input type="hidden" name="redirectTo" value={redirectTo} />
-                          <Button variant="destructive" size="sm" type="submit" className="w-full sm:w-auto">
+                          <Button variant="destructive" size="sm" type="submit">
                             Delete
                           </Button>
                         </form>
                       </div>
-                    </td>
-                  </tr>
+                    </div>
+
+                    {/* Desktop Table Row */}
+                    <div className="hidden lg:grid grid-cols-6 gap-4 items-center">
+                      <div className="col-span-2">
+                        <p className="font-semibold text-slate-900 truncate" title={post.title}>{post.title}</p>
+                        <p className="text-xs text-slate-500">/blog/{post.slug}</p>
+                      </div>
+                      <div>
+                        <Badge className={isPublished ? 'bg-green-50 text-green-700 border-green-200' : ''}>
+                          {post.status}
+                        </Badge>
+                      </div>
+                      <span className="text-sm text-slate-600">{publishedLabel}</span>
+                      <span className="text-sm text-slate-600">{updatedLabel}</span>
+                      <div className="flex items-center justify-end gap-2">
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/dashboard/admin/blog/${post.id}/edit`}>Edit</Link>
+                        </Button>
+                        <form action={setPostPublishedAction as any} className="inline">
+                          <input type="hidden" name="id" value={post.id} />
+                          <input type="hidden" name="publish" value={isPublished ? 'false' : 'true'} />
+                          <input type="hidden" name="redirectTo" value={redirectTo} />
+                          <Button variant={isPublished ? 'ghost' : 'secondary'} size="sm" type="submit">
+                            {isPublished ? 'Unpublish' : 'Publish'}
+                          </Button>
+                        </form>
+                        <form action={deletePostAction as any} className="inline">
+                          <input type="hidden" name="id" value={post.id} />
+                          <input type="hidden" name="redirectTo" value={redirectTo} />
+                          <Button variant="destructive" size="sm" type="submit">
+                            Delete
+                          </Button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
                 );
               })
             )}
-          </tbody>
-        </table>
-      </TableCard>
+          </div>
+        </CardBody>
+      </Card>
 
       <Pagination
         basePath="/dashboard/admin/blog"
