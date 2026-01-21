@@ -3,6 +3,7 @@ import '@uiw/react-md-editor/markdown-editor.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ReactNode } from 'react';
+import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body className={`min-h-screen bg-[#f6f8fb] text-slate-900 ${inter.className}`}>
         {children}
+        <Analytics />
       </body>
     </html>
   );
