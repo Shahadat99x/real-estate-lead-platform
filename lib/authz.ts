@@ -14,6 +14,16 @@ export class ProfileMissingError extends Error {
 }
 
 /**
+ * Error thrown when user has valid profile but wrong role for the requested resource.
+ */
+export class ForbiddenError extends Error {
+  constructor(userRole: string, requiredRoles: Role[]) {
+    super(`User has role '${userRole}' but requires one of: ${requiredRoles.join(', ')}`);
+    this.name = 'ForbiddenError';
+  }
+}
+
+/**
  * Result type for getCurrentProfile that distinguishes different auth states.
  */
 export type AuthState =
@@ -138,10 +148,36 @@ export async function requireRole(
 
   const profile = authState.profile;
 
+  // Check role - log warning in production if role mismatch
   if (!roles.includes(profile.role)) {
+    if (process.env.NODE_ENV === 'production') {
+      console.warn(`[Auth] Access denied: User ${profile.id} has role '${profile.role}' but requires one of: ${roles.join(', ')}`);
+    }
     if (options.redirectTo) redirect(options.redirectTo);
-    throw new Error('Forbidden');
+    throw new ForbiddenError(profile.role, roles);
   }
 
   return profile;
+}
+
+/**
+ * Check if the current user has admin role.
+ * Returns profile if admin, null otherwise (no redirect).
+ */
+export async function checkIsAdmin(): Promise<ProfilesRow | null> {
+  const authState = await getAuthState();
+  const isOk = (state: AuthState): state is { ok: true; profile: ProfilesRow } => state.ok === true;
+  
+  if (!isOk(authState)) {
+    return null;
+  }
+  
+  if (authState.profile.role !== 'ADMIN') {
+    if (process.env.NODE_ENV === 'production') {
+      console.warn(`[Auth] User ${authState.profile.id} with role '${authState.profile.role}' attempted admin-only action`);
+    }
+    return null;
+  }
+  
+  return authState.profile;
 }

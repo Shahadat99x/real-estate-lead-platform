@@ -32,14 +32,46 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 async function main() {
   console.log('Seeding demo data...');
 
+  // First, ensure the admin profile has ADMIN role
+  // This updates the role for the admin email if it exists, or does nothing if not found yet
+  const { data: existingProfile } = await supabase
+    .from('profiles')
+    .select('id, email, role')
+    .eq('email', ADMIN_EMAIL)
+    .single();
+
+  if (existingProfile) {
+    // Update role to ADMIN if not already
+    if (existingProfile.role !== 'ADMIN') {
+      console.log(`Setting role to ADMIN for ${ADMIN_EMAIL}...`);
+      await supabase
+        .from('profiles')
+        .update({ role: 'ADMIN' })
+        .eq('id', existingProfile.id);
+      console.log('Role updated to ADMIN');
+    } else {
+      console.log('Admin profile already has ADMIN role');
+    }
+  } else {
+    console.log(`Warning: No profile found for ${ADMIN_EMAIL}. Create user first, then run seed again.`);
+    console.log('The profile will be created with AGENT role by default. You will need to manually update to ADMIN.');
+  }
+
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('id, email, full_name')
+    .select('id, email, full_name, role')
     .eq('email', ADMIN_EMAIL)
     .single();
 
   if (profileError || !profile) {
     throw new Error(`Admin profile not found for email ${ADMIN_EMAIL}. Create user first.`);
+  }
+
+  // Double-check role is ADMIN after update
+  if (profile.role !== 'ADMIN') {
+    console.error(`ERROR: Profile for ${ADMIN_EMAIL} has role '${profile.role}', expected 'ADMIN'. Please run: UPDATE profiles SET role = 'ADMIN' WHERE email = '${ADMIN_EMAIL}';`);
+  } else {
+    console.log(`Admin profile confirmed: ${profile.email} (${profile.role})`);
   }
 
   const agentSlug = `demo-agent-${profile.id.substring(0, 6)}`;
