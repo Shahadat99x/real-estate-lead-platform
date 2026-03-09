@@ -84,3 +84,4 @@ temp/
 # Uploads (if you ever store files locally)
 # =========================================================
 uploads/
+.vercel

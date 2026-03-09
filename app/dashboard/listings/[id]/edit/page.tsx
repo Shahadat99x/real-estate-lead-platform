@@ -8,7 +8,15 @@ export default async function EditListingPage(props: { params: Promise<{ id: str
   const { id } = await props.params;
   await requireUser();
   const profile = await getCurrentProfile();
-  if (!profile) return null;
+  
+  // Guard: layout handles most cases, but keep defensive check
+  if (!profile) {
+    return (
+      <div className="p-8 text-center text-slate-500">
+        <p>Unable to load your profile. Please try signing out and back in.</p>
+      </div>
+    );
+  }
 
   const listing = await getListingForEdit(id, profile.id, profile.role) as any;
   if (!listing) return notFound();

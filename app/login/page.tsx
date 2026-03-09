@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation';
 import LoginForm from './LoginForm';
 import { getUser } from '../../lib/supabase/server';
-import { getCurrentProfile } from '../../lib/authz';
 
 export default async function LoginPage() {
   const user = await getUser();
@@ -10,8 +9,7 @@ export default async function LoginPage() {
     redirect('/dashboard');
   }
 
-  const profile = await getCurrentProfile();
-
+  // Show login form - no need to fetch profile since user is not logged in
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-50 to-white px-4 py-8">
       <div className="w-full max-w-md rounded-2xl bg-white shadow-xl border border-slate-100 p-6 sm:p-8">
@@ -19,7 +17,7 @@ export default async function LoginPage() {
           <h1 className="text-2xl font-semibold text-slate-900">Welcome back</h1>
           <p className="text-sm text-slate-600">Sign in to manage your listings and leads.</p>
         </div>
-        <LoginForm initialEmail={profile?.email ?? ''} />
+        <LoginForm initialEmail="" />
       </div>
     </div>
   );

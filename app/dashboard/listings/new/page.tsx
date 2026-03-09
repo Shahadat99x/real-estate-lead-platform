@@ -6,7 +6,15 @@ import { getOrCreateAgentForCurrentUser } from '../../../../lib/queries/dashboar
 export default async function NewListingPage() {
   await requireUser();
   const profile = await getCurrentProfile();
-  if (!profile) return null;
+  
+  // Guard: layout handles most cases, but keep defensive check
+  if (!profile) {
+    return (
+      <div className="p-8 text-center text-slate-500">
+        <p>Unable to load your profile. Please try signing out and back in.</p>
+      </div>
+    );
+  }
   // Ensure agent profile exists before showing form
   await getOrCreateAgentForCurrentUser();
 
