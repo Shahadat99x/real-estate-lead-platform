@@ -3,17 +3,12 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTransition, useState } from 'react';
 import { Button } from '../ui/button';
-import { useDebounce } from 'use-debounce'; // Assuming installed, or use effect
 import { useEffect } from 'react';
-
-type LeadsFiltersProps = {
-    // listings?: { id: string; title: string }[];
-};
 
 export function LeadsFilters() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [isPending, startTransition] = useTransition();
+    const [, startTransition] = useTransition();
 
     const [q, setQ] = useState(searchParams.get('q') || '');
     const [status, setStatus] = useState(searchParams.get('status') || 'ALL');

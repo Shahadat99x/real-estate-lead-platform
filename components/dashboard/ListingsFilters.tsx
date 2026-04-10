@@ -3,19 +3,12 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTransition, useState, useEffect } from 'react';
 import { Button } from '../ui/button';
-import { useDebounce } from 'use-debounce'; // If available, otherwise manual debounce or simple effect
-// Assuming no use-debounce installed, I'll use a simple useEffect debounce or just onBlur/Enter for search to keep it simple and performant.
 
-type ListingsFiltersProps = {
-    role: 'ADMIN' | 'AGENT';
-};
-
-export function ListingsFilters({ role }: ListingsFiltersProps) {
+export function ListingsFilters() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [isPending, startTransition] = useTransition();
+    const [, startTransition] = useTransition();
 
-    // Local state for immediate UI feedback
     const [q, setQ] = useState(searchParams.get('q') || '');
     const [params, setParams] = useState({
         status: searchParams.get('status') || 'ALL',
@@ -24,7 +17,6 @@ export function ListingsFilters({ role }: ListingsFiltersProps) {
         sort: searchParams.get('sort') || 'newest',
     });
 
-    // Debounced Search Effect
     useEffect(() => {
         const timer = setTimeout(() => {
             if (q !== (searchParams.get('q') || '')) {
@@ -41,7 +33,6 @@ export function ListingsFilters({ role }: ListingsFiltersProps) {
         } else {
             newParams.delete(key);
         }
-        // Reset page on filter change
         newParams.set('page', '1');
 
         startTransition(() => {
@@ -50,7 +41,6 @@ export function ListingsFilters({ role }: ListingsFiltersProps) {
         });
     }
 
-    // Sync local state when URL changes (e.g. back button)
     useEffect(() => {
         setQ(searchParams.get('q') || '');
         setParams({
@@ -69,7 +59,6 @@ export function ListingsFilters({ role }: ListingsFiltersProps) {
     return (
         <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-4">
             <div className="flex flex-col gap-4">
-                {/* Search */}
                 <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-slate-500 uppercase">Search</label>
                     <input
@@ -80,7 +69,6 @@ export function ListingsFilters({ role }: ListingsFiltersProps) {
                     />
                 </div>
 
-                {/* Filters Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="space-y-1.5">
                         <label className="text-xs font-semibold text-slate-500 uppercase">Status</label>
@@ -108,20 +96,18 @@ export function ListingsFilters({ role }: ListingsFiltersProps) {
                         </select>
                     </div>
 
-                    {role === 'ADMIN' && (
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-slate-500 uppercase">Featured</label>
-                            <select
-                                value={params.featured}
-                                onChange={(e) => handleChange('featured', e.target.value)}
-                                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
-                            >
-                                <option value="ALL">All</option>
-                                <option value="YES">Featured</option>
-                                <option value="NO">Not Featured</option>
-                            </select>
-                        </div>
-                    )}
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-slate-500 uppercase">Featured</label>
+                        <select
+                            value={params.featured}
+                            onChange={(e) => handleChange('featured', e.target.value)}
+                            className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+                        >
+                            <option value="ALL">All</option>
+                            <option value="YES">Featured</option>
+                            <option value="NO">Not Featured</option>
+                        </select>
+                    </div>
 
                     <div className="space-y-1.5">
                         <label className="text-xs font-semibold text-slate-500 uppercase">Sort By</label>

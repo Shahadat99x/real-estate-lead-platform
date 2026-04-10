@@ -1,22 +1,13 @@
 import Link from 'next/link';
 import { ListingWizardInfoForm } from '../../../../components/dashboard/ListingWizardInfoForm';
-import { getCurrentProfile, requireUser } from '../../../../lib/authz';
-import { getOrCreateAgentForCurrentUser } from '../../../../lib/queries/dashboard';
+import { requireRole } from '../../../../lib/authz';
+import { ensureListingOwnerRecord } from '../../../../lib/queries/dashboard';
 
 export default async function NewListingPage() {
-  await requireUser();
-  const profile = await getCurrentProfile();
-  
-  // Guard: layout handles most cases, but keep defensive check
-  if (!profile) {
-    return (
-      <div className="p-8 text-center text-slate-500">
-        <p>Unable to load your profile. Please try signing out and back in.</p>
-      </div>
-    );
-  }
-  // Ensure agent profile exists before showing form
-  await getOrCreateAgentForCurrentUser();
+  await requireRole(['ADMIN']);
+
+  // Ensure the listing owner record exists before showing the form.
+  await ensureListingOwnerRecord();
 
   return (
     <div className="space-y-4">

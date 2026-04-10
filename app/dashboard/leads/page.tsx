@@ -1,4 +1,4 @@
-import { getCurrentProfile, requireUser } from '../../../lib/authz';
+import { requireRole } from '../../../lib/authz';
 import { getDashboardLeads } from '../../../lib/queries/dashboard';
 import { LeadsFilters } from '../../../components/dashboard/LeadsFilters';
 import { LeadsInbox } from '../../../components/dashboard/LeadsInbox';
@@ -14,25 +14,13 @@ export default async function DashboardLeadsPage({
     listing?: string;
   }>;
 }) {
-  await requireUser();
-  const profile = await getCurrentProfile();
-  
-  // Guard: layout handles most cases, but keep defensive check
-  if (!profile) {
-    return (
-      <div className="p-8 text-center text-slate-500">
-        <p>Unable to load your profile. Please try signing out and back in.</p>
-      </div>
-    );
-  }
+  await requireRole(['ADMIN']);
 
   const params = await searchParams;
   const page = Number(params.page) || 1;
   const pageSize = 20;
 
   const { data: leads, count, totalPages } = await getDashboardLeads({
-    profileId: profile.id,
-    role: profile.role,
     q: params.q,
     status: params.status,
     listingId: params.listing,

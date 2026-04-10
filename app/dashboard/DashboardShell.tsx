@@ -8,22 +8,18 @@ import { Badge } from '../../components/ui/badge';
 import type { ProfilesRow } from '../../types/db';
 
 const navItems = [
-  { href: '/dashboard', label: 'Overview', roles: ['ADMIN', 'AGENT'] as const },
-  { href: '/dashboard/listings', label: 'Listings', roles: ['ADMIN', 'AGENT'] as const },
-  { href: '/dashboard/leads', label: 'Leads', roles: ['ADMIN', 'AGENT'] as const },
-  { href: '/dashboard/admin/blog', label: 'Blog', roles: ['ADMIN'] as const },
-  { href: '/dashboard/admin', label: 'Admin', roles: ['ADMIN'] as const },
+  { href: '/dashboard', label: 'Overview' },
+  { href: '/dashboard/listings', label: 'Listings' },
+  { href: '/dashboard/leads', label: 'Leads' },
+  { href: '/dashboard/admin/blog', label: 'Blog' },
+  { href: '/dashboard/admin', label: 'Admin' },
 ];
 
 type Props = { profile: ProfilesRow; children: React.ReactNode };
 
 export default function DashboardShell({ profile, children }: Props) {
   const [open, setOpen] = useState(false);
-  const showAgentUI = profile.role === 'AGENT';
-  const showAdminUI = profile.role === 'ADMIN';
   const pathname = usePathname();
-
-  const filteredNav = navItems.filter((item) => (item.roles as any).includes(profile.role));
 
   const SidebarContent = (
     <div className="h-full flex flex-col bg-white border-r border-slate-200">
@@ -32,7 +28,7 @@ export default function DashboardShell({ profile, children }: Props) {
         <p className="text-xs text-slate-500">Dashboard</p>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {filteredNav.map((item) => {
+        {navItems.map((item) => {
           const active = pathname === item.href;
           return (
             <Link

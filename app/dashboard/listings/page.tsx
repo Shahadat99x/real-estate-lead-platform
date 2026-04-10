@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getCurrentProfile, requireUser } from '../../../lib/authz';
+import { requireRole } from '../../../lib/authz';
 import { getDashboardListings } from '../../../lib/queries/dashboard';
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
@@ -31,25 +31,13 @@ export default async function DashboardListingsPage({
     page?: string;
   }>;
 }) {
-  await requireUser();
-  const profile = await getCurrentProfile();
-  
-  // Guard: layout handles most cases, but keep defensive check
-  if (!profile) {
-    return (
-      <div className="p-8 text-center text-slate-500">
-        <p>Unable to load your profile. Please try signing out and back in.</p>
-      </div>
-    );
-  }
+  await requireRole(['ADMIN']);
 
   const params = await searchParams;
   const page = Number(params.page) || 1;
   const pageSize = 20;
 
   const { data: listings, count, totalPages } = await getDashboardListings({
-    profileId: profile.id,
-    role: profile.role,
     q: params.q,
     status: params.status,
     purpose: params.purpose,
@@ -71,7 +59,7 @@ export default async function DashboardListingsPage({
         </Button>
       </div>
 
-      <ListingsFilters role={profile.role} />
+      <ListingsFilters />
 
       <Card>
         <CardBody className="p-0">

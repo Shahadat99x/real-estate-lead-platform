@@ -1,4 +1,4 @@
-import { getCurrentProfile, requireUser } from '../../lib/authz';
+import { requireRole } from '../../lib/authz';
 import { Card, CardBody, CardHeader } from '../../components/ui/card';
 import { getDashboardOverview } from '../../lib/queries/dashboard';
 import Link from 'next/link';
@@ -16,19 +16,9 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default async function DashboardPage() {
-  await requireUser();
-  const profile = await getCurrentProfile();
-  
-  // Guard: layout already handles missing profile, but keep defensive check
-  if (!profile) {
-    return (
-      <div className="p-8 text-center text-slate-500">
-        <p>Unable to load your profile. Please try signing out and back in.</p>
-      </div>
-    );
-  }
+  const profile = await requireRole(['ADMIN']);
 
-  const { counts, recentLeads, recentListings } = await getDashboardOverview(profile.id, profile.role);
+  const { counts, recentLeads, recentListings } = await getDashboardOverview();
 
   return (
     <div className="space-y-8">

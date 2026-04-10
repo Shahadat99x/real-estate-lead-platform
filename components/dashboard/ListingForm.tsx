@@ -4,7 +4,7 @@ import { useActionState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { Button } from '../ui/button';
-import type { ListingsRow, Role } from '../../types/db';
+import type { ListingsRow } from '../../types/db';
 import { createListingAction, updateListingAction, deleteListingAction, setPublishedAction } from '../../lib/actions/listings';
 
 type FormListing = Partial<ListingsRow> & { id?: string };
@@ -18,7 +18,7 @@ function SubmitButton({ label }: { label: string }) {
   );
 }
 
-export function ListingForm({ listing, role }: { listing?: FormListing; role: Role }) {
+export function ListingForm({ listing }: { listing?: FormListing }) {
   const router = useRouter();
   const initialAction = listing?.id ? updateListingAction : createListingAction;
   const [state, formAction] = useActionState(initialAction, { ok: false });
@@ -180,15 +180,13 @@ export function ListingForm({ listing, role }: { listing?: FormListing; role: Ro
             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
           />
         </div>
-        {role === 'ADMIN' && (
-          <div className="space-y-2">
-            <label className="text-sm text-slate-600">Featured (admin)</label>
-            <div className="flex items-center gap-2">
-              <input type="checkbox" name="featured" defaultChecked={listing?.featured ?? false} />
-              <span className="text-sm text-slate-700">Mark as featured</span>
-            </div>
+        <div className="space-y-2">
+          <label className="text-sm text-slate-600">Featured</label>
+          <div className="flex items-center gap-2">
+            <input type="checkbox" name="featured" defaultChecked={listing?.featured ?? false} />
+            <span className="text-sm text-slate-700">Mark as featured</span>
           </div>
-        )}
+        </div>
 
         {state?.message && !state.ok && (
           <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{state.message}</p>

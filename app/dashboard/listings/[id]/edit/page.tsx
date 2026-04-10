@@ -1,24 +1,14 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ListingForm } from '../../../../../components/dashboard/ListingForm';
-import { getCurrentProfile, requireUser } from '../../../../../lib/authz';
+import { requireRole } from '../../../../../lib/authz';
 import { getListingForEdit } from '../../../../../lib/queries/dashboard';
 
 export default async function EditListingPage(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
-  await requireUser();
-  const profile = await getCurrentProfile();
-  
-  // Guard: layout handles most cases, but keep defensive check
-  if (!profile) {
-    return (
-      <div className="p-8 text-center text-slate-500">
-        <p>Unable to load your profile. Please try signing out and back in.</p>
-      </div>
-    );
-  }
+  await requireRole(['ADMIN']);
 
-  const listing = await getListingForEdit(id, profile.id, profile.role) as any;
+  const listing = await getListingForEdit(id) as any;
   if (!listing) return notFound();
 
   return (
@@ -33,7 +23,7 @@ export default async function EditListingPage(props: { params: Promise<{ id: str
         </Link>
       </div>
       <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-        <ListingForm listing={listing as any} role={profile.role} />
+        <ListingForm listing={listing as any} />
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createServerSupabaseClient } from '../supabase/server';
-import { getOrCreateAgentForCurrentUser } from '../queries/dashboard';
+import { ensureListingOwnerRecord } from '../queries/dashboard';
 import { getCurrentProfile } from '../authz';
 
 const toInt = (val: FormDataEntryValue | null) => {
@@ -19,7 +19,7 @@ export async function createListingAction(_prev: any, formData: FormData) {
   if (!profile) return { ok: false, message: 'Not authenticated' };
 
   const supabase = await createServerSupabaseClient();
-  const agentId = await getOrCreateAgentForCurrentUser();
+  const agentId = await ensureListingOwnerRecord();
 
   const title = String(formData.get('title') || '').trim();
   const city = String(formData.get('city') || '').trim();
@@ -49,7 +49,7 @@ export async function createListingAction(_prev: any, formData: FormData) {
       area_sqm: toNumber(formData.get('area_sqm')),
       lat: toNumber(formData.get('lat')),
       lng: toNumber(formData.get('lng')),
-      featured: profile.role === 'ADMIN' ? formData.get('featured') === 'on' : false,
+      featured: formData.get('featured') === 'on',
       status,
       published_at: status === 'PUBLISHED' ? new Date().toISOString() : null,
     })
@@ -95,7 +95,7 @@ export async function updateListingAction(_prev: any, formData: FormData) {
       area_sqm: toNumber(formData.get('area_sqm')),
       lat: toNumber(formData.get('lat')),
       lng: toNumber(formData.get('lng')),
-      featured: profile.role === 'ADMIN' ? formData.get('featured') === 'on' : false,
+      featured: formData.get('featured') === 'on',
       status,
       published_at: status === 'PUBLISHED' ? new Date().toISOString() : null,
     })

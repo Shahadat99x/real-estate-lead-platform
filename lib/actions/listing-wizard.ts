@@ -3,11 +3,11 @@
 import { redirect } from 'next/navigation';
 import { createServerSupabaseClient } from '../supabase/server';
 import { requireUser } from '../authz';
-import { getOrCreateAgentForCurrentUser } from '../queries/dashboard';
+import { ensureListingOwnerRecord } from '../queries/dashboard';
 
 export async function createListingDraftAction(prevState: any, formData: FormData) {
-    const user = await requireUser();
-    const agentId = await getOrCreateAgentForCurrentUser(user.id);
+    await requireUser();
+    const agentId = await ensureListingOwnerRecord();
 
     const supabase = await createServerSupabaseClient();
 
