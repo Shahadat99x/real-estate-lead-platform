@@ -16,7 +16,7 @@ export default async function NewListingPage() {
           <h1 className="text-2xl font-semibold text-slate-900">Create new listing</h1>
           <p className="text-sm text-slate-600">Step 1: Property details</p>
         </div>
-        <Link href="/dashboard/listings" className="text-sm text-brand-700 font-semibold hover:underline">
+        <Link href="/dashboard/listings" prefetch={false} className="text-sm text-brand-700 font-semibold hover:underline">
           Cancel
         </Link>
       </div>

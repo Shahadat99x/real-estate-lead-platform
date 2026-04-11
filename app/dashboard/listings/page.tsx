@@ -55,7 +55,7 @@ export default async function DashboardListingsPage({
           <p className="text-sm text-slate-600">Manage your property portfolio.</p>
         </div>
         <Button asChild className="w-full sm:w-auto">
-          <Link href="/dashboard/listings/new">New listing</Link>
+          <Link href="/dashboard/listings/new" prefetch={false}>New listing</Link>
         </Button>
       </div>
 
@@ -93,10 +93,10 @@ export default async function DashboardListingsPage({
                   </div>
 
                   <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-100 mt-2">
-                    <Link href={`/dashboard/listings/${listing.id}/media`} className="text-sm text-slate-600 hover:text-brand-700">
+                    <Link href={`/dashboard/listings/${listing.id}/media`} prefetch={false} className="text-sm text-slate-600 hover:text-brand-700">
                       Media
                     </Link>
-                    <Link href={`/dashboard/listings/${listing.id}/edit`} className="text-sm text-brand-700 font-medium">
+                    <Link href={`/dashboard/listings/${listing.id}/edit`} prefetch={false} className="text-sm text-brand-700 font-medium">
                       Edit
                     </Link>
                     <DeleteListingButton id={listing.id} />
@@ -123,10 +123,10 @@ export default async function DashboardListingsPage({
                     {listing.featured && <span className="flex h-2 w-2 rounded-full bg-brand-500" title="Featured" />}
                   </div>
                   <div className="flex items-center justify-end gap-3">
-                    <Link href={`/dashboard/listings/${listing.id}/media`} className="text-sm text-slate-500 hover:text-slate-900" title="Manage Photos">
+                    <Link href={`/dashboard/listings/${listing.id}/media`} prefetch={false} className="text-sm text-slate-500 hover:text-slate-900" title="Manage Photos">
                       Photos
                     </Link>
-                    <Link href={`/dashboard/listings/${listing.id}/edit`} className="text-sm text-brand-600 hover:text-brand-800 font-medium">
+                    <Link href={`/dashboard/listings/${listing.id}/edit`} prefetch={false} className="text-sm text-brand-600 hover:text-brand-800 font-medium">
                       Edit
                     </Link>
                     <PublishToggle id={listing.id} published={listing.status === 'PUBLISHED'} />
@@ -139,7 +139,7 @@ export default async function DashboardListingsPage({
               <div className="px-6 py-12 text-center text-slate-500 bg-slate-50/30">
                 <p>No listings found matching your criteria.</p>
                 <Button variant="ghost" asChild className="mt-2">
-                  <Link href="/dashboard/listings">Clear filters</Link>
+                  <Link href="/dashboard/listings" prefetch={false}>Clear filters</Link>
                 </Button>
               </div>
             )}

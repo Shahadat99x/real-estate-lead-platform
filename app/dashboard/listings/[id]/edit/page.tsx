@@ -18,7 +18,7 @@ export default async function EditListingPage(props: { params: Promise<{ id: str
           <h1 className="text-2xl font-semibold text-slate-900">Edit listing</h1>
           <p className="text-sm text-slate-600">{listing.title}</p>
         </div>
-        <Link href="/dashboard/listings" className="text-sm text-brand-700 font-semibold hover:underline">
+        <Link href="/dashboard/listings" prefetch={false} className="text-sm text-brand-700 font-semibold hover:underline">
           Back to listings
         </Link>
       </div>

@@ -69,7 +69,7 @@ export default async function DashboardPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-900">Recent Leads</h2>
-            <Link href="/dashboard/leads" className="text-sm text-brand-600 hover:text-brand-800 font-medium">
+            <Link href="/dashboard/leads" prefetch={false} className="text-sm text-brand-600 hover:text-brand-800 font-medium">
               View all
             </Link>
           </div>
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
               {recentLeads.length > 0 ? (
                 recentLeads.map((lead) => (
                   <div key={lead.id} className="p-4 hover:bg-slate-50 transition-colors">
-                    <Link href={`/dashboard/leads`} className="block">
+                    <Link href={`/dashboard/leads`} prefetch={false} className="block">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium text-slate-900">{lead.name}</p>
@@ -100,7 +100,7 @@ export default async function DashboardPage() {
                 <div className="p-8 text-center text-slate-500">
                   <p>No new leads yet.</p>
                   <Button variant="outline" asChild className="mt-4">
-                    <Link href="/dashboard/listings">Promote Listings</Link>
+                    <Link href="/dashboard/listings" prefetch={false}>Promote Listings</Link>
                   </Button>
                 </div>
               )}
@@ -112,7 +112,7 @@ export default async function DashboardPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-900">Recently Updated</h2>
-            <Link href="/dashboard/listings" className="text-sm text-brand-600 hover:text-brand-800 font-medium">
+            <Link href="/dashboard/listings" prefetch={false} className="text-sm text-brand-600 hover:text-brand-800 font-medium">
               Manage listings
             </Link>
           </div>
@@ -121,7 +121,7 @@ export default async function DashboardPage() {
               {recentListings.length > 0 ? (
                 recentListings.map((listing) => (
                   <div key={listing.id} className="p-4 hover:bg-slate-50 transition-colors">
-                    <Link href={`/dashboard/listings/${listing.id}/edit`} className="block">
+                    <Link href={`/dashboard/listings/${listing.id}/edit`} prefetch={false} className="block">
                       <div className="flex justify-between items-start">
                         <div className="min-w-0 flex-1 mr-4">
                           <p className="font-medium text-slate-900 truncate">{listing.title}</p>
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
                 <div className="p-8 text-center text-slate-500">
                   <p>No listings created yet.</p>
                   <Button asChild className="mt-4">
-                    <Link href="/dashboard/listings/new">Create Listing</Link>
+                    <Link href="/dashboard/listings/new" prefetch={false}>Create Listing</Link>
                   </Button>
                 </div>
               )}

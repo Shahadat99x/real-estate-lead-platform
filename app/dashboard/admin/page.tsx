@@ -19,7 +19,7 @@ export default function AdminPage() {
               Create, edit, and publish blog posts for the public site.
             </p>
             <Button asChild className="w-full">
-              <Link href="/dashboard/admin/blog">Manage Blog</Link>
+              <Link href="/dashboard/admin/blog" prefetch={false}>Manage Blog</Link>
             </Button>
           </CardBody>
         </Card>
@@ -32,7 +32,7 @@ export default function AdminPage() {
               View and manage all property listings from one owner dashboard.
             </p>
             <Button asChild className="w-full" variant="secondary">
-              <Link href="/dashboard/listings">View Listings</Link>
+              <Link href="/dashboard/listings" prefetch={false}>View Listings</Link>
             </Button>
           </CardBody>
         </Card>
@@ -45,7 +45,7 @@ export default function AdminPage() {
               Manage customer inquiries from a single shared inbox.
             </p>
             <Button asChild className="w-full" variant="secondary">
-              <Link href="/dashboard/leads">View Leads</Link>
+              <Link href="/dashboard/leads" prefetch={false}>View Leads</Link>
             </Button>
           </CardBody>
         </Card>

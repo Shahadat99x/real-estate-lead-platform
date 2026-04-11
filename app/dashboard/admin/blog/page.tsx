@@ -42,7 +42,7 @@ export default async function AdminBlogPage({
           <p className="text-sm text-slate-600">Draft, publish, and manage articles for the public site.</p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/admin/blog/new">New post</Link>
+          <Link href="/dashboard/admin/blog/new" prefetch={false}>New post</Link>
         </Button>
       </div>
 
@@ -119,7 +119,7 @@ export default async function AdminBlogPage({
 
                       <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
                         <Button variant="outline" size="sm" asChild className="flex-1">
-                          <Link href={`/dashboard/admin/blog/${post.id}/edit`}>Edit</Link>
+                          <Link href={`/dashboard/admin/blog/${post.id}/edit`} prefetch={false}>Edit</Link>
                         </Button>
                         <form action={setPostPublishedAction as any} className="flex-1">
                           <input type="hidden" name="id" value={post.id} />
@@ -154,7 +154,7 @@ export default async function AdminBlogPage({
                       <span className="text-sm text-slate-600">{updatedLabel}</span>
                       <div className="flex items-center justify-end gap-2">
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/dashboard/admin/blog/${post.id}/edit`}>Edit</Link>
+                          <Link href={`/dashboard/admin/blog/${post.id}/edit`} prefetch={false}>Edit</Link>
                         </Button>
                         <form action={setPostPublishedAction as any} className="inline">
                           <input type="hidden" name="id" value={post.id} />

@@ -34,6 +34,7 @@ export default function DashboardShell({ profile, children }: Props) {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={false}
               className={clsx(
                 'block rounded-lg px-3 py-2 text-sm font-medium transition',
                 active
@@ -50,7 +51,7 @@ export default function DashboardShell({ profile, children }: Props) {
       <div className="px-4 py-4 border-t border-slate-200 text-sm text-slate-700 space-y-1">
         <p className="font-semibold truncate">{profile.email ?? 'Unknown user'}</p>
         <Badge>{profile.role}</Badge>
-        <Link href="/logout" className="text-brand-700 font-medium text-sm hover:underline">
+        <Link href="/logout" prefetch={false} className="text-brand-700 font-medium text-sm hover:underline">
           Logout
         </Link>
       </div>
@@ -108,6 +109,7 @@ export default function DashboardShell({ profile, children }: Props) {
               <Badge className="hidden sm:inline-flex">{profile.role}</Badge>
               <Link
                 href="/logout"
+                prefetch={false}
                 className="inline-flex items-center rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-sm font-semibold text-brand-700 hover:bg-brand-100 transition"
               >
                 Sign out

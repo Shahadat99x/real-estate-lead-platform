@@ -42,7 +42,7 @@ export default async function EditBlogPostPage(props: { params: Promise<{ id: st
             </Button>
           )}
           <Button variant="ghost" asChild>
-            <Link href="/dashboard/admin/blog" className="text-sm">
+            <Link href="/dashboard/admin/blog" prefetch={false} className="text-sm">
               Back to blog
             </Link>
           </Button>

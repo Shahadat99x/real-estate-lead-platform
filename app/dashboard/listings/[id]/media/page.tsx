@@ -24,7 +24,7 @@ export default async function ListingMediaPage({ params }: { params: Promise<{ i
                     <p className="text-sm text-slate-600">Step 2: Add images and finalize</p>
                 </div>
                 <div className="flex gap-3">
-                    <Link href={`/dashboard/listings/${listing.id}/edit`}>
+                    <Link href={`/dashboard/listings/${listing.id}/edit`} prefetch={false}>
                         <Button variant="ghost">Edit Details</Button>
                     </Link>
                 </div>
@@ -55,7 +55,7 @@ export default async function ListingMediaPage({ params }: { params: Promise<{ i
 
             {/* Actions */}
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
-                <Link href="/dashboard/listings">
+                <Link href="/dashboard/listings" prefetch={false}>
                     <Button variant="ghost">Save as Draft</Button>
                 </Link>
 

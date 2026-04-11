@@ -13,7 +13,7 @@ export default function NewBlogPostPage() {
           <p className="text-sm text-slate-600">Draft a post. You can publish after saving.</p>
         </div>
         <Button variant="ghost" asChild>
-          <Link href="/dashboard/admin/blog" className="text-sm">
+          <Link href="/dashboard/admin/blog" prefetch={false} className="text-sm">
             Back to blog
           </Link>
         </Button>
