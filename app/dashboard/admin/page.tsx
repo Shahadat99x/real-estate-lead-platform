@@ -29,7 +29,7 @@ export default function AdminPage() {
           <CardHeader title="Listings" subtitle="Property management" />
           <CardBody className="space-y-3">
             <p className="text-sm text-slate-600">
-              View and manage all property listings across agents.
+              View and manage all property listings from one owner dashboard.
             </p>
             <Button asChild className="w-full" variant="secondary">
               <Link href="/dashboard/listings">View Listings</Link>
@@ -42,7 +42,7 @@ export default function AdminPage() {
           <CardHeader title="Leads" subtitle="Inquiries and contacts" />
           <CardBody className="space-y-3">
             <p className="text-sm text-slate-600">
-              Manage customer inquiries and lead assignments.
+              Manage customer inquiries from a single shared inbox.
             </p>
             <Button asChild className="w-full" variant="secondary">
               <Link href="/dashboard/leads">View Leads</Link>

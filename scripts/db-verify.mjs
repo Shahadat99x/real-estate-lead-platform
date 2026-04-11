@@ -32,12 +32,12 @@ select id, title, status, published_at from public.listings;
 `.trim(),
   },
   {
-    title: 'Agent can see own draft listings and leads',
+    title: 'Authenticated listing owner can see draft listings and leads',
     sql: `
--- replace with an existing agent UUID
+-- replace with an existing owner/listing profile UUID
 reset all;
 set local role authenticated;
-set local "request.jwt.claim.sub" = '<agent_uuid>';
+set local "request.jwt.claim.sub" = '<owner_uuid>';
 select id, title, status from public.listings;
 select l.id, l.listing_id, l.email from public.leads l;
 `.trim(),

@@ -12,7 +12,6 @@ export default function Footer() {
           <p className="text-sm font-semibold text-slate-900">Links</p>
           <div className="flex flex-col gap-1 text-sm text-slate-600">
             <Link href="/listings" className="hover:text-brand-700">Listings</Link>
-            <Link href="/agents" className="hover:text-brand-700">Agents</Link>
             <Link href="/blog" className="hover:text-brand-700">Blog</Link>
             <Link href="/login" className="hover:text-brand-700">Admin login</Link>
           </div>

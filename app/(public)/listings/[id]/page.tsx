@@ -82,7 +82,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             </div>
             {listing.agents?.display_name && (
               <p>
-                Listed by:{' '}
+                Presented by:{' '}
                 <span className="font-semibold text-slate-900">
                   {listing.agents.display_name}
                 </span>

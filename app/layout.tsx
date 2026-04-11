@@ -15,14 +15,14 @@ export const metadata: Metadata = {
     default: 'EstateNova | Modern Real Estate Platform',
     template: '%s | EstateNova',
   },
-  description: 'Find your dream home with EstateNova. Browse verified listings, read market insights, and connect with top agents.',
+  description: 'Find your dream home with EstateNova. Browse verified listings, read market insights, and contact the EstateNova team.',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: '/',
     siteName: 'EstateNova',
     title: 'EstateNova | Modern Real Estate Platform',
-    description: 'Find your dream home with EstateNova. Browse verified listings, read market insights, and connect with top agents.',
+    description: 'Find your dream home with EstateNova. Browse verified listings, read market insights, and contact the EstateNova team.',
     images: [
       {
         url: '/og-image.jpg', // Only if exists, fallback will happen naturally if not specific
